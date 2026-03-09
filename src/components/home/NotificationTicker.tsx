@@ -85,7 +85,7 @@ const NotificationTicker = () => {
                     className="flex items-center whitespace-nowrap gap-8 md:gap-12 pl-[100px] md:pl-[140px]"
                 >
                     {/* Render notifications twice for seamless looping */}
-                    {[...notifications, ...notifications].map((item, idx) => (
+                    {(notifications.length > 1 ? [...notifications, ...notifications] : notifications).map((item, idx) => (
                         <Link
                             key={`${item.id}-${idx}`}
                             to={item.link}
