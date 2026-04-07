@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
-import logo from "@/assets/truscomp-logo.webp";
+import logo from "@/assets/truscomp-logo.png";
 import { useSettings } from "@/hooks/useSettings";
 
 const Footer = () => {

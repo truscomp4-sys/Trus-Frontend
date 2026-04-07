@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/truscomp-logo.webp";
+import logo from "@/assets/truscomp-logo.png";
 import { useSettings } from "@/hooks/useSettings";
 import {
     DropdownMenu,

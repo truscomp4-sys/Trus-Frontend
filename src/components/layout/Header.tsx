@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Calculator, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/truscomp-logo.webp";
+import logo from "@/assets/truscomp-logo.png";
 import ServicesDropdown from "./ServicesDropdown";
 
 const navLinks = [
