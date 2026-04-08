@@ -35,9 +35,13 @@ const AdminLogin = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        console.log("handleLogin called with email:", email);
 
         try {
-            const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+            // Priority: Env var > Hardcoded Production API (safety fallback) > Current domain
+            const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.truscomp.com/api/v1";
+            console.log("Using API base:", apiBase);
+
             const response = await fetch(`${apiBase}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -49,7 +53,8 @@ const AdminLogin = () => {
 
             if (response.ok) {
                 localStorage.setItem("adminToken", data.accessToken);
-                document.cookie = `adminToken=${data.accessToken}; path=/; SameSite=Lax`;
+                // Ensure cookie is set with expiration so middleware can always read it
+                document.cookie = `adminToken=${data.accessToken}; path=/; max-age=86400; SameSite=Lax; Secure`;
                 toast.success("Login successful! Redirecting...");
                 setTimeout(() => router.push("/admin/dashboard"), 1500);
             } else {
