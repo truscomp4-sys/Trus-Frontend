@@ -3,6 +3,23 @@ import type { MetadataRoute } from 'next'
 const BASE_URL = 'https://truscomp.com'
 const API = process.env.NEXT_PUBLIC_API_BASE_URL
 
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 8000) {
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    })
+    clearTimeout(id)
+    return response
+  } catch (err) {
+    clearTimeout(id)
+    console.error(`Fetch timeout/error for ${url}:`, err)
+    throw err
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: BASE_URL, priority: 1.0, changeFrequency: 'weekly' },
@@ -18,11 +35,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/terms-conditions`, priority: 0.3, changeFrequency: 'yearly' },
   ]
 
+  if (!API) {
+    console.warn('NEXT_PUBLIC_API_BASE_URL is not defined. Returning static routes only.')
+    return staticRoutes
+  }
+
   try {
     const [servicesRes, blogsRes, updatesRes] = await Promise.allSettled([
-      fetch(`${API}/services?public_view=true`, { next: { revalidate: 3600 } }),
-      fetch(`${API}/blogs?status=active&limit=100`, { next: { revalidate: 3600 } }),
-      fetch(`${API}/labour-law-updates?status=active&limit=100`, { next: { revalidate: 3600 } }),
+      fetchWithTimeout(`${API}/services?public_view=true`, { next: { revalidate: 3600 } }),
+      fetchWithTimeout(`${API}/blogs?status=active&limit=100`, { next: { revalidate: 3600 } }),
+      fetchWithTimeout(`${API}/labour-law-updates?status=active&limit=100`, { next: { revalidate: 3600 } }),
     ])
 
     const dynamicRoutes: MetadataRoute.Sitemap = []
@@ -67,7 +89,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     return [...staticRoutes, ...dynamicRoutes]
-  } catch {
+  } catch (error) {
+    console.error('Error generating dynamic sitemap routes:', error)
     return staticRoutes
   }
 }
