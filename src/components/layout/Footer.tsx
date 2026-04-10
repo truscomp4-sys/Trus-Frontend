@@ -138,20 +138,20 @@ const Footer = () => {
                       settings.office_address.country
                     ].filter(Boolean).join(', ') + (settings.office_address.pincode ? ` - ${settings.office_address.pincode}` : '')
                   ) : (
-                    "No 9, Pe Ve Plaza, Lakshmi Nagar, Porur, Chennai - 600116"
+                    "TrusComp Private Limited, No.9, 3rd Floor, Pe Ve plaza, Lakshmi Nagar, Tamil Nadu, India - 600116"
                   )}
                 </span>
               </li>
               <li className="flex items-center gap-3 text-sm text-background/70">
                 <Phone className="w-4 h-4 shrink-0" />
-                <a href={`tel:${settings?.contact_phone || '+914449006000'}`} className="hover:text-primary transition-colors">
-                  {settings?.contact_phone || '+91 44 4900 6000'}
+                <a href={`tel:${settings?.contact_phone || '+918754048634'}`} className="hover:text-primary transition-colors">
+                  {settings?.contact_phone || '+91 87540 48634'}
                 </a>
               </li>
               <li className="flex items-center gap-3 text-sm text-background/70">
                 <Mail className="w-4 h-4 shrink-0" />
-                <a href={`mailto:${settings?.contact_email || 'contact@truscomp.com'}`} className="hover:text-primary transition-colors">
-                  {settings?.contact_email || 'contact@truscomp.com'}
+                <a href={`mailto:${settings?.contact_email || 'info@truscomp.com'}`} className="hover:text-primary transition-colors">
+                  {settings?.contact_email || 'info@truscomp.com'}
                 </a>
               </li>
             </ul>
