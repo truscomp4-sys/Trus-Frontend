@@ -138,29 +138,21 @@ const Footer = () => {
                       settings.office_address.country
                     ].filter(Boolean).join(', ') + (settings.office_address.pincode ? ` - ${settings.office_address.pincode}` : '')
                   ) : (
-                    "Office details coming soon"
+                    "No 9, Pe Ve Plaza, Lakshmi Nagar, Porur, Chennai - 600116"
                   )}
                 </span>
               </li>
               <li className="flex items-center gap-3 text-sm text-background/70">
                 <Phone className="w-4 h-4 shrink-0" />
-                {settings?.contact_phone ? (
-                  <a href={`tel:${settings.contact_phone}`} className="hover:text-primary transition-colors">
-                    {settings.contact_phone}
-                  </a>
-                ) : (
-                  <span className="italic opacity-60">Not provided</span>
-                )}
+                <a href={`tel:${settings?.contact_phone || '+914449006000'}`} className="hover:text-primary transition-colors">
+                  {settings?.contact_phone || '+91 44 4900 6000'}
+                </a>
               </li>
               <li className="flex items-center gap-3 text-sm text-background/70">
                 <Mail className="w-4 h-4 shrink-0" />
-                {settings?.contact_email ? (
-                  <a href={`mailto:${settings.contact_email}`} className="hover:text-primary transition-colors">
-                    {settings.contact_email}
-                  </a>
-                ) : (
-                  <span className="italic opacity-60">Not provided</span>
-                )}
+                <a href={`mailto:${settings?.contact_email || 'contact@truscomp.com'}`} className="hover:text-primary transition-colors">
+                  {settings?.contact_email || 'contact@truscomp.com'}
+                </a>
               </li>
             </ul>
           </div>
