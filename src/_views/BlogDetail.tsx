@@ -246,8 +246,14 @@ const BlogDetail = ({ id }: { id: string }) => {
                                     <div className="w-10 h-1 bg-gradient-to-r from-primary to-accent rounded-full" />
                                     Detailed Analysis
                                 </h2>
-                                <div
-                                    className="prose prose-slate max-w-none text-gray-600 leading-relaxed space-y-4 prose-headings:text-gray-900 prose-headings:font-bold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-li:marker:text-primary"
+                                 <div
+                                    className="prose prose-slate max-w-none text-gray-600 leading-relaxed space-y-4 
+  break-normal whitespace-normal"
+                                    style={{
+                                        wordBreak: 'normal',
+                                        overflowWrap: 'break-word',
+                                        whiteSpace: 'normal'
+                                    }}
                                     dangerouslySetInnerHTML={{ __html: post.long_description }}
                                 />
                             </AnimatedContentSection>
