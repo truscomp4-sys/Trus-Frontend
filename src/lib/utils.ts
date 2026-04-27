@@ -26,11 +26,19 @@ export const authenticatedFetch = async (url: string, options: RequestInit = {})
 
   const response = await fetch(url, options);
 
-  if (response.status === 401) {
-    console.error("401 Unauthorized - Token might be invalid or missing");
-    toast.error("Session expired or unauthorized. Please login again.");
-    // Optional: Redirect to login
-    // window.location.href = "/admin/login";
+  if (response.status === 401 || response.status === 403) {
+    console.error(`Auth Error ${response.status} - Token invalid or expired`);
+    
+    // Only redirect if we are in an admin route to avoid annoying public users
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+      localStorage.removeItem("adminToken");
+      toast.error("Session expired. Please login again.");
+      
+      // Short delay so the toast can be seen before redirect
+      setTimeout(() => {
+        window.location.href = "/admin/login";
+      }, 1500);
+    }
   }
 
   return response;
