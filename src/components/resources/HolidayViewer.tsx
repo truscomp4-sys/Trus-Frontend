@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react";
-import { StateHolidayList, HOLIDAY_DATA } from "@/data/resourcesData";
+import { StateHolidayList } from "@/data/resourcesData";
 import { cn } from "@/lib/utils";
 import { MapPin, Calendar, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,22 +10,38 @@ interface HolidayViewerProps {
     holidayData?: StateHolidayList[];
 }
 
-const HolidayViewer = ({ holidayData = HOLIDAY_DATA }: HolidayViewerProps) => {
-    // Check if data is available
-    const displayData = holidayData.length > 0 ? holidayData : HOLIDAY_DATA;
+const HolidayViewer = ({ holidayData = [] }: HolidayViewerProps) => {
+    // Only use data passed from props (Admin Panel)
+    const displayData = holidayData;
     const [selectedState, setSelectedState] = useState(displayData[0]);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Update selected state if holidayData changes and current selection is not in new data
+    // Update selected state if holidayData changes
     useEffect(() => {
-        if (holidayData.length > 0 && !holidayData.find(s => s.stateName === selectedState?.stateName)) {
-            setSelectedState(holidayData[0]);
+        if (displayData.length > 0) {
+            if (!selectedState || !displayData.find(s => s.stateName === selectedState?.stateName)) {
+                setSelectedState(displayData[0]);
+            }
+        } else {
+            setSelectedState(undefined as any);
         }
-    }, [holidayData]);
+    }, [displayData]);
 
     const filteredStates = displayData.filter(s =>
         s.stateName.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    if (displayData.length === 0) {
+        return (
+            <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-20 text-center">
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-gray-300" />
+                </div>
+                <h3 className="text-gray-900 font-bold text-lg">No Holidays Available</h3>
+                <p className="text-gray-500 mt-2">There are currently no holiday lists uploaded for this year.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm flex flex-col lg:flex-row h-[700px]">
@@ -96,7 +112,7 @@ const HolidayViewer = ({ holidayData = HOLIDAY_DATA }: HolidayViewerProps) => {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={selectedState.stateName}

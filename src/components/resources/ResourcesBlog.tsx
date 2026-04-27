@@ -137,7 +137,7 @@ const ResourcesBlog = () => {
 
                 {/* Secondary Articles - Timeline Style with Scrollable Container */}
                 <div className="lg:col-span-2">
-                    <div className="relative max-h-[420px] overflow-y-auto pr-2 scrollbar-thin">
+                    <div className="relative max-h-[420px] overflow-y-auto overflow-x-hidden pr-2 scrollbar-thin">
                         {/* Vertical Timeline Line */}
                         <div className="absolute left-0 top-4 bottom-4 w-px bg-gradient-to-b from-primary/50 via-accent/30 to-transparent hidden md:block" />
 
