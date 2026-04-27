@@ -215,6 +215,7 @@ const BlogDetail = ({ id }: { id: string }) => {
 
                         {/* Main Content */}
                         <main className="lg:col-span-8 space-y-12">
+                            <article className="break-words text-justify">
                             {/* Introduction */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
@@ -246,15 +247,14 @@ const BlogDetail = ({ id }: { id: string }) => {
                                     <div className="w-10 h-1 bg-gradient-to-r from-primary to-accent rounded-full" />
                                     Detailed Analysis
                                 </h2>
-                                 <div
-                                    className="prose prose-slate max-w-none text-gray-600 leading-relaxed space-y-4 
-  break-normal whitespace-normal"
-                                    style={{
-                                        wordBreak: 'normal',
-                                        overflowWrap: 'break-word',
-                                        whiteSpace: 'normal'
+                                <div
+                                    className="prose prose-slate max-w-none text-gray-600 leading-relaxed space-y-4"
+                                    dangerouslySetInnerHTML={{ 
+                                        __html: (post.long_description || "")
+                                            .replace(/[\u00a0]/g, ' ')
+                                            .replace(/&nbsp;/g, ' ')
+                                            .replace(/&amp;nbsp;/g, ' ')
                                     }}
-                                    dangerouslySetInnerHTML={{ __html: post.long_description }}
                                 />
                             </AnimatedContentSection>
 
@@ -266,7 +266,12 @@ const BlogDetail = ({ id }: { id: string }) => {
                                 </h2>
                                 <div
                                     className="prose prose-slate max-w-none text-gray-700 leading-relaxed font-medium prose-p:text-lg prose-headings:text-gray-900 prose-a:text-primary prose-strong:text-gray-900"
-                                    dangerouslySetInnerHTML={{ __html: post.final_thoughts }}
+                                    dangerouslySetInnerHTML={{ 
+                                        __html: (post.final_thoughts || "")
+                                            .replace(/[\u00a0]/g, ' ')
+                                            .replace(/&nbsp;/g, ' ')
+                                            .replace(/&amp;nbsp;/g, ' ')
+                                    }}
                                 />
                             </AnimatedContentSection>
 
@@ -298,6 +303,7 @@ const BlogDetail = ({ id }: { id: string }) => {
                                     </div>
                                 </div>
                             )}
+                            </article>
                         </main>
 
                         {/* Sticky Sidebar */}
