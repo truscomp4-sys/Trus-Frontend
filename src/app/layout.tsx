@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { Providers } from './providers'
+import SchemaRenderer from '@/components/seo/SchemaRenderer'
 import '../index.css'
 
 export const metadata: Metadata = {
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </noscript>
+        <SchemaRenderer />
         <Providers>{children}</Providers>
       </body>
     </html>

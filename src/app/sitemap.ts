@@ -88,7 +88,47 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
 
-    return [...staticRoutes, ...dynamicRoutes]
+    // Fetch sitemap customizations from settings API
+    let exclusions: string[] = []
+    let customRoutes: string[] = []
+    try {
+      const sitemapSettingsRes = await fetch(`${API}/settings/sitemap_customizations`, { next: { revalidate: 60 } })
+      if (sitemapSettingsRes.ok) {
+        const data = await sitemapSettingsRes.json()
+        if (data && data.value) {
+          exclusions = Array.isArray(data.value.exclusions) ? data.value.exclusions : []
+          customRoutes = Array.isArray(data.value.customRoutes) ? data.value.customRoutes : []
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching sitemap customizations:', err)
+    }
+
+    // Combined static and dynamic routes
+    let allRoutes = [...staticRoutes, ...dynamicRoutes]
+
+    // Filter out exclusions
+    if (exclusions.length > 0) {
+      allRoutes = allRoutes.filter((route) => {
+        const relativePath = route.url.replace(BASE_URL, '') || '/'
+        return !exclusions.some((exc) => exc.toLowerCase().trim() === relativePath.toLowerCase().trim())
+      })
+    }
+
+    // Append custom routes
+    for (const cr of customRoutes) {
+      const trimmed = cr.trim()
+      if (trimmed) {
+        allRoutes.push({
+          url: trimmed.startsWith('http') ? trimmed : `${BASE_URL}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`,
+          priority: 0.7,
+          changeFrequency: 'weekly',
+          lastModified: new Date(),
+        })
+      }
+    }
+
+    return allRoutes
   } catch (error) {
     console.error('Error generating dynamic sitemap routes:', error)
     return staticRoutes
