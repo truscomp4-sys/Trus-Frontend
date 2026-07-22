@@ -12,7 +12,10 @@ import {
     X,
     Plus,
     FileCode,
-    ChevronDown
+    ChevronDown,
+    CheckCircle2,
+    AlertCircle,
+    Copy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,6 +58,7 @@ const SEOManager = () => {
         twitter_title: '',
         twitter_description: '',
         schema_type: 'Organization',
+        schema_json: '',
         status: 'published'
     });
 
@@ -123,6 +127,7 @@ const SEOManager = () => {
                     twitter_title: String(data.twitter_title || ''),
                     twitter_description: String(data.twitter_description || ''),
                     schema_type: String(data.schema_type || 'Organization'),
+                    schema_json: data.schema_json ? (typeof data.schema_json === 'object' ? JSON.stringify(data.schema_json, null, 2) : String(data.schema_json)) : '',
                     status: String(data.status || 'published')
                 });
             } else {
@@ -136,6 +141,7 @@ const SEOManager = () => {
                     twitter_title: '',
                     twitter_description: '',
                     schema_type: 'Organization',
+                    schema_json: '',
                     status: 'published'
                 });
             }
@@ -168,6 +174,7 @@ const SEOManager = () => {
                 twitter_title: '',
                 twitter_description: '',
                 schema_type: 'Organization',
+                schema_json: '',
                 status: 'published'
             });
         }
@@ -186,6 +193,16 @@ const SEOManager = () => {
         const activeItem = getActiveSEOItem();
         if (!activeItem) return;
 
+        let parsedSchema = null;
+        if (seoData.schema_json && seoData.schema_json.trim()) {
+            try {
+                parsedSchema = JSON.parse(seoData.schema_json);
+            } catch (err: any) {
+                toast.error(`Invalid JSON in Schema Markup: ${err.message}`);
+                return;
+            }
+        }
+
         setIsSaving(true);
         try {
             const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
@@ -197,6 +214,7 @@ const SEOManager = () => {
                 },
                 body: JSON.stringify({
                     ...seoData,
+                    schema_json: parsedSchema,
                     page_type,
                     page_reference_id: activeItem.reference_id
                 })
@@ -416,6 +434,122 @@ const SEOManager = () => {
                                                 ))
                                             ) : (
                                                 <span className="text-[10px] text-slate-400 italic px-1">No keywords added yet.</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Schema Markup (JSON-LD)</label>
+                                            <Select
+                                                value=""
+                                                onValueChange={(template) => {
+                                                    const templates: Record<string, object> = {
+                                                        Organization: {
+                                                            "@context": "https://schema.org",
+                                                            "@type": "Organization",
+                                                            "name": "TrusComp",
+                                                            "url": "https://truscomp.com",
+                                                            "logo": "https://truscomp.com/logo.png",
+                                                            "contactPoint": { "@type": "ContactPoint", "telephone": "", "contactType": "customer service" }
+                                                        },
+                                                        LocalBusiness: {
+                                                            "@context": "https://schema.org",
+                                                            "@type": "LocalBusiness",
+                                                            "name": "TrusComp",
+                                                            "address": { "@type": "PostalAddress", "streetAddress": "", "addressLocality": "", "addressRegion": "", "postalCode": "" },
+                                                            "telephone": "",
+                                                            "url": "https://truscomp.com"
+                                                        },
+                                                        WebPage: {
+                                                            "@context": "https://schema.org",
+                                                            "@type": "WebPage",
+                                                            "name": "",
+                                                            "description": "",
+                                                            "url": "https://truscomp.com"
+                                                        },
+                                                        FAQPage: {
+                                                            "@context": "https://schema.org",
+                                                            "@type": "FAQPage",
+                                                            "mainEntity": [
+                                                                { "@type": "Question", "name": "Your question?", "acceptedAnswer": { "@type": "Answer", "text": "Your answer." } }
+                                                            ]
+                                                        },
+                                                        Service: {
+                                                            "@context": "https://schema.org",
+                                                            "@type": "Service",
+                                                            "name": "",
+                                                            "description": "",
+                                                            "provider": { "@type": "Organization", "name": "TrusComp" },
+                                                            "serviceType": ""
+                                                        },
+                                                        Article: {
+                                                            "@context": "https://schema.org",
+                                                            "@type": "Article",
+                                                            "headline": "",
+                                                            "author": { "@type": "Organization", "name": "TrusComp" },
+                                                            "datePublished": "",
+                                                            "image": ""
+                                                        },
+                                                        BreadcrumbList: {
+                                                            "@context": "https://schema.org",
+                                                            "@type": "BreadcrumbList",
+                                                            "itemListElement": [
+                                                                { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://truscomp.com" },
+                                                                { "@type": "ListItem", "position": 2, "name": "Page", "item": "https://truscomp.com/page" }
+                                                            ]
+                                                        }
+                                                    };
+                                                    if (templates[template]) {
+                                                        setSeoData({ ...seoData, schema_json: JSON.stringify(templates[template], null, 2), schema_type: template });
+                                                    }
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-[180px] h-8 text-[10px] font-bold uppercase tracking-wider border-slate-200">
+                                                    <SelectValue placeholder="Insert Template..." />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Organization">Organization</SelectItem>
+                                                    <SelectItem value="LocalBusiness">Local Business</SelectItem>
+                                                    <SelectItem value="WebPage">Web Page</SelectItem>
+                                                    <SelectItem value="FAQPage">FAQ Page</SelectItem>
+                                                    <SelectItem value="Service">Service</SelectItem>
+                                                    <SelectItem value="Article">Article / Blog</SelectItem>
+                                                    <SelectItem value="BreadcrumbList">Breadcrumb List</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <Textarea
+                                            rows={6}
+                                            value={seoData.schema_json}
+                                            onChange={(e) => setSeoData({ ...seoData, schema_json: e.target.value })}
+                                            placeholder={`{\n  "@context": "https://schema.org",\n  "@type": "Organization",\n  "name": "TrusComp"\n}`}
+                                            className={`font-mono text-xs text-slate-700 border-slate-200 min-h-[150px] resize-y leading-relaxed ${
+                                                seoData.schema_json.trim() && (() => { try { JSON.parse(seoData.schema_json); return false; } catch { return true; } })()
+                                                    ? 'border-red-300 focus-visible:ring-red-400'
+                                                    : ''
+                                            }`}
+                                        />
+                                        <div className="flex items-center justify-between">
+                                            {seoData.schema_json.trim() ? (
+                                                (() => {
+                                                    try {
+                                                        JSON.parse(seoData.schema_json);
+                                                        return (
+                                                            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-500">
+                                                                <CheckCircle2 className="w-3 h-3" /> Valid JSON-LD
+                                                            </span>
+                                                        );
+                                                    } catch (e: any) {
+                                                        return (
+                                                            <span className="flex items-center gap-1 text-[10px] font-bold text-red-500">
+                                                                <AlertCircle className="w-3 h-3" /> {e.message}
+                                                            </span>
+                                                        );
+                                                    }
+                                                })()
+                                            ) : (
+                                                <p className="text-[10px] text-slate-400 font-medium italic">Select a template or enter valid JSON-LD.</p>
                                             )}
                                         </div>
                                     </div>

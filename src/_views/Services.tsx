@@ -9,9 +9,11 @@ import { ArrowRight } from "lucide-react";
 import { ServiceProcessFlow } from "@/components/services/ServiceProcessFlow";
 
 import { useSEO } from "@/hooks/useSEO";
+import { useHasMounted } from "@/hooks/useHasMounted";
 
 const Services = () => {
   useSEO("services_main");
+  const hasMounted = useHasMounted();
   const [services, setServices] = useState<any[]>([]);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ const Services = () => {
 
             {/* Unique Motion Element: Kinetic Particle Field */}
             <div className="absolute inset-0 pointer-events-none">
-              {[...Array(20)].map((_, i) => (
+              {hasMounted && [...Array(20)].map((_, i) => (
                 <motion.div
                   key={i}
                   className="absolute rounded-full bg-primary/20"

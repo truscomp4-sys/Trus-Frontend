@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
+import { useHasMounted } from "@/hooks/useHasMounted";
 
 interface PageBackgroundProps {
     children?: ReactNode;
@@ -7,6 +8,7 @@ interface PageBackgroundProps {
 }
 
 export const PageBackground = ({ children, className = "" }: PageBackgroundProps) => {
+    const hasMounted = useHasMounted();
     return (
         <div className={`relative min-h-screen bg-white overflow-hidden ${className}`}>
             {/* 
@@ -31,7 +33,7 @@ export const PageBackground = ({ children, className = "" }: PageBackgroundProps
 
                 {/* Floating Dots - Group 1 */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-                    {[...Array(12)].map((_, i) => (
+                    {hasMounted && [...Array(12)].map((_, i) => (
                         <motion.div
                             key={`dot-${i}`}
                             className="absolute rounded-full bg-primary/10"

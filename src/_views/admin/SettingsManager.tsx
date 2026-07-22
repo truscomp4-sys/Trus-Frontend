@@ -16,7 +16,9 @@ import {
     Instagram,
     Twitter,
     Info,
-    MessageCircle
+    MessageCircle,
+    Eye,
+    EyeOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -236,6 +238,26 @@ const SettingsManager = () => {
                     }
                 });
                 payloadSettings = filteredSettings;
+            } else if (activeTab === 'seo') {
+                // Keep only SEO settings keys
+                const seoKeys = ['robots_txt', 'sitemap_customizations'];
+                const filteredSettings: any = {};
+                seoKeys.forEach(key => {
+                    if (payloadSettings[key] !== undefined) {
+                        filteredSettings[key] = payloadSettings[key];
+                    }
+                });
+
+                // Clean sitemap exclusions and customRoutes (remove empty strings)
+                if (filteredSettings.sitemap_customizations) {
+                    const sc = filteredSettings.sitemap_customizations;
+                    filteredSettings.sitemap_customizations = {
+                        exclusions: Array.isArray(sc.exclusions) ? sc.exclusions.map((e: string) => e.trim()).filter(Boolean) : [],
+                        customRoutes: Array.isArray(sc.customRoutes) ? sc.customRoutes.map((r: string) => r.trim()).filter(Boolean) : []
+                    };
+                }
+
+                payloadSettings = filteredSettings;
             }
 
             // Convert simple object to array of { key, value } for batch update
@@ -256,7 +278,21 @@ const SettingsManager = () => {
             });
 
             if (response.ok) {
-                toast.success(`${activeTab === 'email' ? 'Email configuration' : 'Settings'} saved successfully`);
+                const tabLabel = activeTab === 'email' ? 'Email configuration' : activeTab === 'seo' ? 'Sitemap & Robots' : 'Settings';
+                toast.success(`${tabLabel} saved successfully`);
+
+                // Trigger on-demand revalidation for SEO-related cached pages
+                if (activeTab === 'seo') {
+                    try {
+                        await fetch('/api/revalidate', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paths: ['/robots.txt', '/sitemap.xml'] }),
+                        });
+                    } catch (revalErr) {
+                        console.warn('Cache revalidation request failed (non-critical):', revalErr);
+                    }
+                }
             } else {
                 const data = await response.json();
                 console.error("Save failed:", data);
@@ -387,6 +423,18 @@ const SettingsManager = () => {
                     >
                         Email Configuration
                         {activeTab === 'email' && (
+                            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('seo')}
+                        className={cn(
+                            "pb-3 text-xs font-bold uppercase tracking-wider transition-all relative",
+                            activeTab === 'seo' ? "text-primary" : "text-slate-500 hover:text-slate-800"
+                        )}
+                    >
+                        Sitemap & Robots
+                        {activeTab === 'seo' && (
                             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />
                         )}
                     </button>
@@ -846,6 +894,102 @@ const SettingsManager = () => {
                                     Send Test Email
                                 </Button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'seo' && (
+                <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col animate-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                        {/* Robots.txt Configuration */}
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded w-fit uppercase tracking-wider">Robots.txt Rules</h3>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Configure Robots.txt Content</label>
+                                <Textarea
+                                    rows={8}
+                                    value={settings.robots_txt || ''}
+                                    onChange={(e) => updateSetting('robots_txt', e.target.value)}
+                                    className="font-mono text-xs text-slate-700 border-slate-200 min-h-[160px] resize-y leading-relaxed"
+                                    placeholder={`User-agent: *\nDisallow: /admin\nDisallow: /api\n\nSitemap: https://truscomp.com/sitemap.xml`}
+                                />
+                                <p className="text-[10px] text-slate-400">Specify crawler instructions. Changes reflect immediately on `/robots.txt`.</p>
+                            </div>
+                            {settings.robots_txt && (
+                                <div className="mt-3 border border-slate-100 rounded-lg overflow-hidden">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border-b border-slate-100">
+                                        <Eye className="w-3 h-3 text-slate-400" />
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Live Preview — /robots.txt</span>
+                                    </div>
+                                    <pre className="p-3 text-[11px] font-mono text-slate-600 bg-white whitespace-pre-wrap leading-relaxed">{settings.robots_txt}</pre>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Sitemap Customizations */}
+                        <div className="space-y-4 pt-6 border-t border-slate-100">
+                            <h3 className="text-xs font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded w-fit uppercase tracking-wider">Sitemap Controls</h3>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sitemap Excluded Routes</label>
+                                    <Textarea
+                                        rows={6}
+                                        value={settings.sitemap_customizations?.exclusions?.join('\n') || ''}
+                                        onChange={(e) => {
+                                            const lines = e.target.value.split('\n');
+                                            updateNestedSetting('sitemap_customizations', 'exclusions', lines);
+                                        }}
+                                        className="font-mono text-xs text-slate-700 border-slate-200 min-h-[120px] resize-y leading-relaxed"
+                                        placeholder={`/admin\n/privacy-policy\n/terms-conditions`}
+                                    />
+                                    <p className="text-[10px] text-slate-400">List relative paths (one per line) to exclude from `/sitemap.xml`.</p>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sitemap Custom Routes</label>
+                                    <Textarea
+                                        rows={6}
+                                        value={settings.sitemap_customizations?.customRoutes?.join('\n') || ''}
+                                        onChange={(e) => {
+                                            const lines = e.target.value.split('\n');
+                                            updateNestedSetting('sitemap_customizations', 'customRoutes', lines);
+                                        }}
+                                        className="font-mono text-xs text-slate-700 border-slate-200 min-h-[120px] resize-y leading-relaxed"
+                                        placeholder={`/special-offer\n/hiring`}
+                                    />
+                                    <p className="text-[10px] text-slate-400">List extra relative paths (one per line) to include in `/sitemap.xml`.</p>
+                                </div>
+                            </div>
+                            {((settings.sitemap_customizations?.exclusions?.filter(Boolean).length > 0) || (settings.sitemap_customizations?.customRoutes?.filter(Boolean).length > 0)) && (
+                                <div className="mt-4 border border-slate-100 rounded-lg overflow-hidden">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border-b border-slate-100">
+                                        <Eye className="w-3 h-3 text-slate-400" />
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sitemap Summary</span>
+                                    </div>
+                                    <div className="p-3 space-y-2">
+                                        {settings.sitemap_customizations?.exclusions?.filter(Boolean).length > 0 && (
+                                            <div>
+                                                <span className="text-[10px] font-bold text-rose-500 uppercase">Excluded ({settings.sitemap_customizations.exclusions.filter(Boolean).length}):</span>
+                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                    {settings.sitemap_customizations.exclusions.filter(Boolean).map((e: string, i: number) => (
+                                                        <span key={i} className="text-[10px] font-mono bg-rose-50 text-rose-600 px-2 py-0.5 rounded border border-rose-100">{e.trim()}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        {settings.sitemap_customizations?.customRoutes?.filter(Boolean).length > 0 && (
+                                            <div>
+                                                <span className="text-[10px] font-bold text-emerald-500 uppercase">Added ({settings.sitemap_customizations.customRoutes.filter(Boolean).length}):</span>
+                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                    {settings.sitemap_customizations.customRoutes.filter(Boolean).map((r: string, i: number) => (
+                                                        <span key={i} className="text-[10px] font-mono bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded border border-emerald-100">{r.trim()}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -276,7 +276,7 @@ const Contact = () => {
                             settings.office_address.country
                           ].filter(Boolean).join(', ') + (settings.office_address.pincode ? ` - ${settings.office_address.pincode}` : '')
                         ) : (
-                          "No 9, Pe Ve Plaza, Lakshmi Nagar, Porur, Chennai - 600116"
+                          "TrusComp Private Limited, No.9, 3rd Floor, Pe Ve plaza, Lakshmi Nagar, Tamil Nadu, India - 600116"
                         )}
                       </p>
                     </div>
@@ -292,8 +292,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-slate-900 mb-1">Phone</h4>
-                      <a href={`tel:${settings?.contact_phone || '+914449006000'}`} className="text-sm text-slate-600 hover:text-primary transition-colors block">
-                        {settings?.contact_phone || '+91 44 4900 6000'}
+                      <a href={`tel:${settings?.contact_phone || '+918754048634'}`} className="text-sm text-slate-600 hover:text-primary transition-colors block">
+                        {settings?.contact_phone || '+91 87540 48634'}
                       </a>
                     </div>
                   </motion.div>
@@ -308,8 +308,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-slate-900 mb-1">Email</h4>
-                      <a href={`mailto:${settings?.contact_email || 'contact@truscomp.com'}`} className="text-sm text-slate-600 hover:text-primary transition-colors block">
-                        {settings?.contact_email || 'contact@truscomp.com'}
+                      <a href={`mailto:${settings?.contact_email || 'info@truscomp.com'}`} className="text-sm text-slate-600 hover:text-primary transition-colors block">
+                        {settings?.contact_email || 'info@truscomp.com'}
                       </a>
                     </div>
                   </motion.div>

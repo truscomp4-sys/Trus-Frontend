@@ -79,8 +79,8 @@ const PrivacyPolicy = () => {
                             <p className="text-slate-600 mb-4">
                                 For questions regarding this Privacy Policy, please contact us.
                             </p>
-                            <a href="mailto:contact@truscomp.com" className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-primary text-white font-medium shadow-md hover:bg-primary/90 transition-all hover:-translate-y-0.5">
-                                contact@truscomp.com
+                            <a href="mailto:info@truscomp.com" className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-primary text-white font-medium shadow-md hover:bg-primary/90 transition-all hover:-translate-y-0.5">
+                                info@truscomp.com
                             </a>
                         </motion.div>
                     </div>

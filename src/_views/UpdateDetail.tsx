@@ -100,7 +100,7 @@ const UpdateDetail = ({ id: slug }: { id: string }) => {
                                 {sections.map((section, index) => (
                                     <section
                                         key={section.title}
-                                        ref={(el) => (observerRefs.current[index] = el)}
+                                        ref={(el) => { if (el) observerRefs.current[index] = el; }}
                                         className="opacity-0 transition-all duration-700"
                                     >
                                         <div className="flex items-center gap-4 mb-6">

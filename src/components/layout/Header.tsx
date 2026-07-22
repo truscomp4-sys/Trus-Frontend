@@ -9,10 +9,16 @@ import { Button } from "@/components/ui/button";
 import logo from "@/assets/truscomp-logo.png";
 import ServicesDropdown from "./ServicesDropdown";
 
-const navLinks = [
+interface NavLink {
+  name: string;
+  path: string;
+  icon?: any;
+}
+
+const navLinks: NavLink[] = [
   { name: "Home", path: "/" },
   { name: "About Us", path: "/about" },
-  { name: "Wage Calculator", path: "/calculator", icon: Calculator },
+  { name: "Wage Calculator", path: "/calculator" },
   { name: "Testimonials", path: "/testimonials" },
   { name: "Resources", path: "/resources" },
   { name: "Contact", path: "/contact" },

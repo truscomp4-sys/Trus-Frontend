@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { getToken, setToken } from "@/lib/utils";
 import logo from "@/assets/truscomp-logo-full.png";
 
 const AdminLogin = () => {
@@ -26,7 +27,7 @@ const AdminLogin = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const token = localStorage.getItem("adminToken");
+        const token = getToken();
         if (token) {
             router.replace("/admin/dashboard");
         }
@@ -35,9 +36,13 @@ const AdminLogin = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        console.log("handleLogin called with email:", email);
 
         try {
-            const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+            // Priority: Env var > Hardcoded Production API (safety fallback) > Current domain
+            const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.truscomp.com/api/v1";
+            console.log("Using API base:", apiBase);
+
             const response = await fetch(`${apiBase}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -48,8 +53,9 @@ const AdminLogin = () => {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem("adminToken", data.accessToken);
-                document.cookie = `adminToken=${data.accessToken}; path=/; SameSite=Lax`;
+                // Store the token in the adminToken cookie (read by the route guard
+                // in middleware.ts and attached as the Authorization header).
+                setToken(data.accessToken);
                 toast.success("Login successful! Redirecting...");
                 setTimeout(() => router.push("/admin/dashboard"), 1500);
             } else {

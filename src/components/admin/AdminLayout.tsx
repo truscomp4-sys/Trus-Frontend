@@ -22,9 +22,10 @@ import {
     Search,
     Menu,
     X,
-    ShieldCheck
+    ShieldCheck,
+    HelpCircle
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, clearToken } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/truscomp-logo.png";
 import { useSettings } from "@/hooks/useSettings";
@@ -98,6 +99,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         { label: "Labour Law Updates", icon: BookOpen, path: "/admin/labour-law-updates" },
         { label: "Blog Management", icon: FileText, path: "/admin/blogs" },
         { label: "Testimonials", icon: Star, path: "/admin/testimonials" },
+        { label: "FAQ Manager", icon: HelpCircle, path: "/admin/faq" },
         { label: "SEO Manager", icon: Globe, path: "/admin/seo" },
         { label: "System Settings", icon: Settings, path: "/admin/settings" },
     ];
@@ -105,8 +107,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     const currentPath = pathname;
 
     const handleLogout = () => {
-        localStorage.removeItem("adminToken");
-        document.cookie = 'adminToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        clearToken();
+        // Best-effort: also clear the httpOnly refresh token cookie server-side
+        // so the long-lived session is truly ended, not just the client marker.
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.truscomp.com/api/v1";
+        fetch(`${apiBase}/auth/logout`, { method: "POST", credentials: "include" }).catch(() => {});
         router.replace("/admin/login");
     };
 

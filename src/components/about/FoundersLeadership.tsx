@@ -14,7 +14,7 @@ const founders = [
     {
         name: "Mr. PPK Mahindhra",
         role: "Co-Founder",
-        image: "/images/leadership/ppk-mahindhra.png",
+        image: "/images/leadership/ppk-mahindhra1.png",
         expertise: ["26+ Years Experience", "Automation Pioneer", "RPA-Powered Tools"],
         description: "Driving the digital transformation of compliance through high-performance systems."
     },

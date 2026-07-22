@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
+import { useHasMounted } from "@/hooks/useHasMounted";
 
 export const TopologyBackground = () => {
+    const hasMounted = useHasMounted();
     return (
         <div className="absolute inset-0 overflow-hidden bg-white pointer-events-none">
             {/* Soft Base Gradient */}
@@ -71,7 +73,7 @@ export const TopologyBackground = () => {
 
             {/* Floating Regulatory Particles */}
             <div className="absolute inset-0 pointer-events-none">
-                {[...Array(20)].map((_, i) => (
+                {hasMounted && [...Array(20)].map((_, i) => (
                     <motion.div
                         key={`p-${i}`}
                         className="absolute rounded-full bg-[#FF8C00]"

@@ -1,7 +1,24 @@
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = 'https://truscomp.com'
+const BASE_URL = 'https://www.truscomp.com'
 const API = process.env.NEXT_PUBLIC_API_BASE_URL
+
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 8000) {
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    })
+    clearTimeout(id)
+    return response
+  } catch (err) {
+    clearTimeout(id)
+    console.error(`Fetch timeout/error for ${url}:`, err)
+    throw err
+  }
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -18,11 +35,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/terms-conditions`, priority: 0.3, changeFrequency: 'yearly' },
   ]
 
+  if (!API) {
+    console.warn('NEXT_PUBLIC_API_BASE_URL is not defined. Returning static routes only.')
+    return staticRoutes
+  }
+
   try {
     const [servicesRes, blogsRes, updatesRes] = await Promise.allSettled([
-      fetch(`${API}/services?public_view=true`, { next: { revalidate: 3600 } }),
-      fetch(`${API}/blogs?status=active&limit=100`, { next: { revalidate: 3600 } }),
-      fetch(`${API}/labour-law-updates?status=active&limit=100`, { next: { revalidate: 3600 } }),
+      fetchWithTimeout(`${API}/services?public_view=true`, { next: { revalidate: 3600 } }),
+      fetchWithTimeout(`${API}/blogs?status=active&limit=100`, { next: { revalidate: 3600 } }),
+      fetchWithTimeout(`${API}/labour-law-updates?status=active&limit=100`, { next: { revalidate: 3600 } }),
     ])
 
     const dynamicRoutes: MetadataRoute.Sitemap = []
@@ -66,8 +88,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
 
-    return [...staticRoutes, ...dynamicRoutes]
-  } catch {
+    // Fetch sitemap customizations from settings API
+    let exclusions: string[] = []
+    let customRoutes: string[] = []
+    try {
+      const sitemapSettingsRes = await fetch(`${API}/settings/sitemap_customizations`, { next: { revalidate: 60 } })
+      if (sitemapSettingsRes.ok) {
+        const data = await sitemapSettingsRes.json()
+        if (data && data.value) {
+          exclusions = Array.isArray(data.value.exclusions) ? data.value.exclusions : []
+          customRoutes = Array.isArray(data.value.customRoutes) ? data.value.customRoutes : []
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching sitemap customizations:', err)
+    }
+
+    // Combined static and dynamic routes
+    let allRoutes = [...staticRoutes, ...dynamicRoutes]
+
+    // Filter out exclusions
+    if (exclusions.length > 0) {
+      allRoutes = allRoutes.filter((route) => {
+        const relativePath = route.url.replace(BASE_URL, '') || '/'
+        return !exclusions.some((exc) => exc.toLowerCase().trim() === relativePath.toLowerCase().trim())
+      })
+    }
+
+    // Append custom routes
+    for (const cr of customRoutes) {
+      const trimmed = cr.trim()
+      if (trimmed) {
+        allRoutes.push({
+          url: trimmed.startsWith('http') ? trimmed : `${BASE_URL}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`,
+          priority: 0.7,
+          changeFrequency: 'weekly',
+          lastModified: new Date(),
+        })
+      }
+    }
+
+    return allRoutes
+  } catch (error) {
+    console.error('Error generating dynamic sitemap routes:', error)
     return staticRoutes
   }
 }

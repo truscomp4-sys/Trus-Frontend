@@ -8,7 +8,7 @@ import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const VerifyEmailChange = () => {
-    const [searchParams] = useSearchParams();
+    const searchParams = useSearchParams();
     const router = useRouter();
     const token = searchParams.get("token");
 

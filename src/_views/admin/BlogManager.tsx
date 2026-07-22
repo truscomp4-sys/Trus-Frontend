@@ -269,11 +269,29 @@ const BlogManager = () => {
 
         setIsSaving(true);
         try {
+            // Clean all forms of non-breaking spaces from incoming content
+            const cleanText = (str: string) => {
+                if (!str) return '';
+                return str
+                    .replace(/[\u00a0]/g, ' ')      // Unicode NBSP
+                    .replace(/&nbsp;/g, ' ')        // Standard HTML entity
+                    .replace(/&amp;nbsp;/g, ' ')    // Double encoded entity
+                    .replace(/\s{2,}/g, ' ');       // Collapse multiple spaces to one
+            };
+            
+            const cleanedBlog = {
+                ...selectedBlog,
+                title: cleanText(selectedBlog.title),
+                short_description: cleanText(selectedBlog.short_description),
+                long_description: cleanText(selectedBlog.long_description),
+                final_thoughts: cleanText(selectedBlog.final_thoughts)
+            };
+
             const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
             const response = await authenticatedFetch(`${apiBase}/blogs/upsert`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(selectedBlog),
+                body: JSON.stringify(cleanedBlog),
                 // credentials: 'include'
             });
 
