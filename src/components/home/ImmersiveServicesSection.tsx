@@ -171,7 +171,7 @@ const ServiceMoment = ({
                     className="w-48 h-48 lg:w-80 lg:h-80"
                 >
                     <path
-                        d={paths.main}
+                        d={paths?.main || "M0 0"}
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2"
@@ -187,7 +187,7 @@ const ServiceMoment = ({
                         }}
                     />
                     <path
-                        d={paths.accent}
+                        d={paths?.accent || "M0 0"}
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="1.5"

@@ -35,10 +35,10 @@ const WageCalculator = () => {
               <Button
                 onClick={handleRedirect}
                 size="lg"
-                className="btn-primary px-8 py-7 lg:px-12 lg:py-8 text-lg font-bold rounded-xl shadow-[0_10px_30px_rgba(255,140,0,0.3)] hover:shadow-[0_15px_40px_rgba(255,140,0,0.4)] transition-all flex items-center gap-3 group"
+                className="btn-primary max-w-full px-4 py-4 sm:px-8 sm:py-6 lg:px-12 lg:py-8 text-sm sm:text-base lg:text-lg font-bold rounded-xl shadow-[0_10px_30px_rgba(255,140,0,0.3)] hover:shadow-[0_15px_40px_rgba(255,140,0,0.4)] transition-all flex items-center justify-center gap-2 sm:gap-3 group"
               >
-                TrusComp Wage Code Calculator
-                <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span className="truncate sm:whitespace-normal">TrusComp Wage Code Calculator</span>
+                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:scale-110 transition-transform" />
               </Button>
             </div>
           </div>

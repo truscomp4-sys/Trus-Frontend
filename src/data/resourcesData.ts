@@ -386,6 +386,14 @@ export const actsData = MOCK_RESOURCES.filter(r => r.category === "Acts").map(ac
     released: act.releaseDate,
     effectiveDate: act.effectiveDate,
     downloadUrl: act.downloadUrl,
+    tags: ["Compliance", "Statutory"],
+    objectives: [act.description],
+    provisions: [{ title: "General Provision", desc: act.description }],
+    applicability: ["All eligible establishments"],
+    obligations: ["Maintain required records and filings"],
+    benefits: ["Legal protection and compliance assurance"],
+    penalties: ["Penalties as prescribed under statutory rules"],
+    stateVariations: [{ state: act.state, rule: "Standard State Rule Applies" }]
 }));
 
 // Filtered data for Forms  

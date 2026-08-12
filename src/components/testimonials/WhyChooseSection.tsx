@@ -44,15 +44,19 @@ const WhyChooseSection = ({ items }: { items: WhyChooseItem[] }) => {
         <section className="relative py-10 md:py-24 bg-[#FAFAFA] border-t border-gray-100 overflow-hidden">
             {/* Background Flying Particles Animation */}
             <div className="absolute inset-0 pointer-events-none">
-                {[...Array(5)].map((_, i) => (
+                {[
+                    { size: 180, top: "20%", left: "15%", duration: 15 },
+                    { size: 220, top: "60%", left: "70%", duration: 18 },
+                    { size: 140, top: "35%", left: "80%", duration: 12 },
+                ].map((p, i) => (
                     <motion.div
                         key={i}
                         className="absolute rounded-full bg-[#FF8C00]/10 blur-xl"
                         style={{
-                            width: Math.random() * 200 + 50,
-                            height: Math.random() * 200 + 50,
-                            top: `${Math.random() * 100}%`,
-                            left: `${Math.random() * 100}%`,
+                            width: p.size,
+                            height: p.size,
+                            top: p.top,
+                            left: p.left,
                         }}
                         animate={{
                             y: [0, -50, 0],
@@ -60,7 +64,7 @@ const WhyChooseSection = ({ items }: { items: WhyChooseItem[] }) => {
                             scale: [1, 1.2, 1],
                         }}
                         transition={{
-                            duration: Math.random() * 10 + 10,
+                            duration: p.duration,
                             repeat: Infinity,
                             ease: "easeInOut",
                         }}

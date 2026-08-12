@@ -83,35 +83,35 @@ export const SoftGradientBackground = () => {
                 </svg>
 
                 {/* Outer Floating Icons */}
-                {[Scale, ShieldCheck, ClipboardList, Receipt, Banknote, Scroll, Users].map((Icon, i) => {
-                    const isLeft = i % 2 === 0;
-                    const leftPos = isLeft ? Math.random() * 15 + 2 : 83 + Math.random() * 15; // Kept strictly to sides
-
-                    return (
-                        <motion.div
-                            key={`icon-${i}`}
-                            className="absolute p-4 bg-white/60 backdrop-blur-md border border-white/80 rounded-2xl text-[#c2410c] shadow-sm flex items-center justify-center"
-                            style={{
-                                left: `${leftPos}%`,
-                                top: `${Math.random() * 70 + 15}%`,
-                            }}
-                            animate={{
-                                y: [0, -40, 0],
-                                rotate: [0, 5, -5, 0],
-                                scale: [1, 1.05, 1],
-                                opacity: [0.6, 0.9, 0.6]
-                            }}
-                            transition={{
-                                duration: 12 + Math.random() * 8,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                                delay: Math.random() * 5
-                            }}
-                        >
-                            <Icon size={isLeft ? 24 : 32} strokeWidth={1.5} />
-                        </motion.div>
-                    );
-                })}
+                {[
+                    { Icon: Scale, isLeft: true, left: "5%", top: "20%", duration: 14, delay: 0 },
+                    { Icon: ShieldCheck, isLeft: false, left: "88%", top: "28%", duration: 18, delay: 1 },
+                    { Icon: ClipboardList, isLeft: true, left: "10%", top: "45%", duration: 16, delay: 2 },
+                    { Icon: Receipt, isLeft: false, left: "85%", top: "58%", duration: 15, delay: 0.5 },
+                    { Icon: Banknote, isLeft: true, left: "4%", top: "72%", duration: 19, delay: 1.5 },
+                    { Icon: Scroll, isLeft: false, left: "90%", top: "82%", duration: 13, delay: 2.5 },
+                    { Icon: Users, isLeft: true, left: "12%", top: "88%", duration: 17, delay: 3 },
+                ].map(({ Icon, isLeft, left, top, duration, delay }, i) => (
+                    <motion.div
+                        key={`icon-${i}`}
+                        className="absolute p-4 bg-white/60 backdrop-blur-md border border-white/80 rounded-2xl text-[#c2410c] shadow-sm flex items-center justify-center"
+                        style={{ left, top }}
+                        animate={{
+                            y: [0, -40, 0],
+                            rotate: [0, 5, -5, 0],
+                            scale: [1, 1.05, 1],
+                            opacity: [0.6, 0.9, 0.6]
+                        }}
+                        transition={{
+                            duration,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay
+                        }}
+                    >
+                        <Icon size={isLeft ? 24 : 32} strokeWidth={1.5} />
+                    </motion.div>
+                ))}
             </div>
 
             {/* 6. Soft Fog Overlay (Depth) */}

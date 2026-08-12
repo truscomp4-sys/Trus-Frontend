@@ -342,9 +342,9 @@ export const ActsRedesign = () => {
                                                 <section className="space-y-12">
                                                     <h4 className="text-center text-[10px] font-black uppercase tracking-[0.4em] text-orange-400">Key Provisions Flow</h4>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        {activeAct.provisions.map((prov, i) => (
+                                                        {activeAct.provisions.map((prov: any, i: number) => (
                                                             <motion.div
-                                                                key={prov.id}
+                                                                key={prov.id || prov.title || i}
                                                                 className="group p-6 lg:p-8 bg-white border border-gray-100 rounded-[32px] hover:border-orange-200 hover:shadow-xl transition-all duration-500"
                                                                 initial={{ opacity: 0, y: 30 }}
                                                                 whileInView={{ opacity: 1, y: 0 }}
@@ -357,7 +357,7 @@ export const ActsRedesign = () => {
                                                                     <Zap className="w-5 h-5 text-orange-200 group-hover:text-orange-500 transition-colors" />
                                                                 </div>
                                                                 <h5 className="text-lg lg:text-xl font-black text-gray-900 mb-3 tracking-tight">{prov.title}</h5>
-                                                                <p className="text-sm text-gray-500 font-light leading-relaxed mb-6">{prov.detail}</p>
+                                                                <p className="text-sm text-gray-500 font-light leading-relaxed mb-6">{prov.detail || prov.desc}</p>
 
                                                                 {/* Act Specific Visuals */}
                                                                 {prov.visual === "formula-death" && <FormulaDoodle type="formula-death" />}
@@ -378,7 +378,7 @@ export const ActsRedesign = () => {
                                                     </div>
 
                                                     <div className="flex flex-wrap justify-center gap-3 lg:gap-4">
-                                                        {activeAct.applicability.included.map(item => (
+                                                        {((activeAct as any).applicability?.included || (Array.isArray(activeAct.applicability) ? activeAct.applicability : [])).map((item: any) => (
                                                             <div key={item} className="p-4 lg:p-6 bg-white rounded-2xl lg:rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center gap-3">
                                                                 <Building2 className="w-6 h-6 lg:w-8 lg:h-8 text-orange-500/20" />
                                                                 <span className="text-[10px] lg:text-xs font-bold text-gray-600 whitespace-nowrap">{item}</span>
@@ -449,13 +449,15 @@ export const ActsRedesign = () => {
                                                             <div className="space-y-4">
                                                                 <p className="text-sm text-gray-500 font-light">Rules vary by state. Common variations include:</p>
                                                                 <div className="flex flex-wrap justify-center gap-2">
-                                                                    {activeAct.stateVariations?.map(s => (
-                                                                        <span key={s} className="px-3 py-1 bg-white border border-gray-100 rounded-full text-[10px] font-bold text-gray-600 shadow-xs">{s}</span>
+                                                                    {activeAct.stateVariations?.map((s: any, idx: number) => (
+                                                                        <span key={typeof s === 'string' ? s : (s.state || idx)} className="px-3 py-1 bg-white border border-gray-100 rounded-full text-[10px] font-bold text-gray-600 shadow-xs">
+                                                                            {typeof s === 'string' ? s : `${s.state}: ${s.rule}`}
+                                                                        </span>
                                                                     ))}
                                                                 </div>
                                                             </div>
                                                         ) : (
-                                                            <p className="text-sm text-gray-500 font-light leading-relaxed">{activeAct.penalties}</p>
+                                                            <p className="text-sm text-gray-500 font-light leading-relaxed">{Array.isArray(activeAct.penalties) ? activeAct.penalties.join(', ') : activeAct.penalties}</p>
                                                         )}
                                                     </section>
                                                 )}

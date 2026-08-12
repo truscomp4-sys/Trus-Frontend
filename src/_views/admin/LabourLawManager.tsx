@@ -39,7 +39,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { authenticatedFetch } from "@/lib/utils";
+import { authenticatedFetch, handleDocumentDownload } from "@/lib/utils";
 
 interface LabourLawUpdate {
     id: number;
@@ -840,7 +840,7 @@ const LabourLawManager = () => {
                                                     variant="secondary"
                                                     size="sm"
                                                     className="h-8 px-3 text-xs"
-                                                    onClick={() => window.open(doc.url, '_blank')}
+                                                    onClick={() => handleDocumentDownload(doc.url, doc.name || 'Labour_Law_Update')}
                                                 >
                                                     <FileText className="w-3 h-3 mr-1" /> View
                                                 </Button>

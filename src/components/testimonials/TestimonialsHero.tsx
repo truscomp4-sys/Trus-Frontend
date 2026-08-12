@@ -112,27 +112,34 @@ const TestimonialsHero = () => {
 
                 {/* Subtle Particle Motion Layer */}
                 <div className="absolute inset-0 opacity-30">
-                    {[...Array(6)].map((_, i) => (
+                    {[
+                        { size: 10, top: "15%", left: "20%", x: [0, 20, 0], duration: 14, delay: 0 },
+                        { size: 12, top: "35%", left: "75%", x: [0, -25, 0], duration: 18, delay: 1 },
+                        { size: 8, top: "60%", left: "15%", x: [0, 15, 0], duration: 15, delay: 2 },
+                        { size: 14, top: "70%", left: "85%", x: [0, -20, 0], duration: 12, delay: 0.5 },
+                        { size: 6, top: "85%", left: "40%", x: [0, 30, 0], duration: 20, delay: 3 },
+                        { size: 10, top: "25%", left: "55%", x: [0, -15, 0], duration: 16, delay: 2.5 },
+                    ].map((p, i) => (
                         <motion.div
                             key={i}
                             className="absolute rounded-full bg-primary/30 blur-sm"
                             style={{
-                                width: Math.random() * 10 + 5,
-                                height: Math.random() * 10 + 5,
-                                top: `${Math.random() * 100}%`,
-                                left: `${Math.random() * 100}%`,
+                                width: p.size,
+                                height: p.size,
+                                top: p.top,
+                                left: p.left,
                             }}
                             animate={{
                                 y: [0, -100, 0],
-                                x: [0, Math.random() * 50 - 25, 0],
+                                x: p.x,
                                 scale: [0, 1, 0],
                                 opacity: [0, 0.5, 0]
                             }}
                             transition={{
-                                duration: Math.random() * 10 + 10,
+                                duration: p.duration,
                                 repeat: Infinity,
                                 ease: "linear",
-                                delay: Math.random() * 5
+                                delay: p.delay
                             }}
                         />
                     ))}

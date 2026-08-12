@@ -202,21 +202,30 @@ export const TrustComplianceVisual = () => {
             ))}
 
             {/* Floating Regulatory Particles & Orbs */}
-            {[...Array(15)].map((_, i) => (
+            {[
+                { x: [-150, 150], y: [-200, 200], duration: 12, delay: 0 },
+                { x: [200, -100], y: [-150, 150], duration: 18, delay: 1 },
+                { x: [-250, 100], y: [100, -200], duration: 15, delay: 2 },
+                { x: [100, -200], y: [-250, 100], duration: 22, delay: 0.5 },
+                { x: [-180, 180], y: [150, -150], duration: 14, delay: 3 },
+                { x: [220, -120], y: [-100, 220], duration: 20, delay: 1.5 },
+                { x: [-80, 250], y: [-180, 120], duration: 16, delay: 4 },
+                { x: [150, -250], y: [200, -100], duration: 24, delay: 2.5 },
+            ].map((p, i) => (
                 <motion.div
                     key={`particle-${i}`}
                     className={`absolute rounded-full ${i % 3 === 0 ? "w-2 h-2 bg-primary/20 blur-[2px]" : "w-1 h-1 bg-primary/30"}`}
                     animate={{
-                        x: [Math.random() * 600 - 300, Math.random() * 600 - 300],
-                        y: [Math.random() * 600 - 300, Math.random() * 600 - 300],
+                        x: p.x,
+                        y: p.y,
                         opacity: [0, 0.5, 0],
                         scale: [0, 1.2, 0]
                     }}
                     transition={{
-                        duration: 10 + Math.random() * 15,
+                        duration: p.duration,
                         repeat: Infinity,
                         ease: "easeInOut",
-                        delay: Math.random() * 5
+                        delay: p.delay
                     }}
                 />
             ))}

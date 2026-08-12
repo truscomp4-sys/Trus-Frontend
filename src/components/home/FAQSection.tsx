@@ -1,11 +1,14 @@
 'use client'
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
-const faqs = [
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.truscomp.com/api/v1";
+
+// Fallback copy — shown until (and if) custom FAQs are fetched from the admin.
+const DEFAULT_FAQS = [
   {
     id: 1,
     question: "What compliances do you handle?",
@@ -30,7 +33,20 @@ const faqs = [
 
 const FAQSection = () => {
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [faqs, setFaqs] = useState(DEFAULT_FAQS);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Load admin-managed FAQs; keep the hardcoded fallback on any error/empty.
+    fetch(`${API_BASE}/settings/home_faqs`)
+      .then((res) => res.json())
+      .then((data) => {
+        const value = data?.value;
+        const list = Array.isArray(value?.faqs) ? value.faqs : Array.isArray(value) ? value : null;
+        if (list && list.length > 0) setFaqs(list);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section

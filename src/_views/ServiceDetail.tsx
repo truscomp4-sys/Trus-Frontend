@@ -63,7 +63,7 @@ const ServiceDetail = ({ id }: { id: string }) => {
                 <div className="section-container py-16 md:py-24">
                     <div className="grid lg:grid-cols-3 gap-12">
                         {/* Main Content Column */}
-                        <div className="lg:col-span-2 space-y-16">
+                        <div className="lg:col-span-2 space-y-16 min-w-0">
                             <OverviewSection service={service} />
                             {service.problems?.length > 0 && <ProblemsSection problems={service.problems} />}
                             {service.features?.length > 0 && <FeaturesGrid features={service.features} />}
@@ -134,14 +134,20 @@ const ServiceHero = ({ service }: any) => {
 };
 
 const OverviewSection = ({ service }: any) => {
+    const rawHtml = service.long_overview || `<p>We ensure complete compliance for ${service.title} through our automated TrusComp platform. Our system streamlines all regulatory requirements, reducing risk and operational overhead for your organization.</p>`;
+    const sanitizedHtml = rawHtml
+        .replace(/[\u00a0]/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;nbsp;/g, ' ');
+
     return (
         <div>
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <ShieldCheck className="w-6 h-6 text-primary" /> Service Overview
             </h2>
             <div
-                className="prose prose-slate max-w-none text-foreground/80 leading-relaxed p-6 bg-card rounded-xl border border-border shadow-sm"
-                dangerouslySetInnerHTML={{ __html: service.long_overview || `<p>We ensure complete compliance for ${service.title} through our automated TrusComp platform. Our system streamlines all regulatory requirements, reducing risk and operational overhead for your organization.</p>` }}
+                className="prose prose-slate max-w-none text-foreground/80 leading-relaxed p-6 bg-card rounded-xl border border-border shadow-sm break-words overflow-hidden text-justify"
+                dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
             />
         </div>
     )
@@ -266,7 +272,12 @@ const FAQSection = ({ faqs }: any) => {
                             {faq.question}
                         </AccordionTrigger>
                         <AccordionContent className="text-muted-foreground pb-6 leading-relaxed">
-                            <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                            <div className="prose prose-sm max-w-none dark:prose-invert break-words" dangerouslySetInnerHTML={{ 
+                                __html: (faq.answer || "")
+                                    .replace(/[\u00a0]/g, ' ')
+                                    .replace(/&nbsp;/g, ' ')
+                                    .replace(/&amp;nbsp;/g, ' ')
+                            }} />
                         </AccordionContent>
                     </AccordionItem>
                 ))}

@@ -7,24 +7,31 @@ export const DigitalLibraryVisuals = () => {
     return (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {/* 1. Floating Document Cards (Bottom to Top) */}
-            {[...Array(6)].map((_, i) => (
+            {[
+                { left: "15%", rotate: 2, duration: 18, delay: 0 },
+                { left: "30%", rotate: -4, duration: 22, delay: 3 },
+                { left: "50%", rotate: 5, duration: 16, delay: 6 },
+                { left: "68%", rotate: -2, duration: 24, delay: 2 },
+                { left: "82%", rotate: 4, duration: 20, delay: 5 },
+                { left: "40%", rotate: -3, duration: 19, delay: 8 },
+            ].map((doc, i) => (
                 <motion.div
                     key={`doc-${i}`}
                     className="absolute bg-white/40 backdrop-blur-sm border border-white/60 p-3 rounded-lg shadow-sm flex flex-col gap-2 w-24 md:w-32"
                     style={{
-                        left: `${10 + Math.random() * 80}%`, // Random horizontal position
-                        bottom: "-20%", // Start below screen
+                        left: doc.left,
+                        bottom: "-20%",
                     }}
                     animate={{
-                        y: [-50, -600], // Float up
-                        rotate: [Math.random() * 10 - 5, Math.random() * 10 - 5], // Slight tilt
-                        opacity: [0, 0.6, 0] // Fade in and out
+                        y: [-50, -600],
+                        rotate: [doc.rotate, doc.rotate],
+                        opacity: [0, 0.6, 0]
                     }}
                     transition={{
-                        duration: 15 + Math.random() * 10,
+                        duration: doc.duration,
                         repeat: Infinity,
                         ease: "linear",
-                        delay: Math.random() * 10
+                        delay: doc.delay
                     }}
                 >
                     {/* Abstract Content Lines */}

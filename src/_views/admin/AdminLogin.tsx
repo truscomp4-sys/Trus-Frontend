@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { getToken, setToken } from "@/lib/utils";
 import logo from "@/assets/truscomp-logo-full.png";
 
 const AdminLogin = () => {
@@ -26,7 +27,7 @@ const AdminLogin = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const token = localStorage.getItem("adminToken");
+        const token = getToken();
         if (token) {
             router.replace("/admin/dashboard");
         }
@@ -52,9 +53,9 @@ const AdminLogin = () => {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem("adminToken", data.accessToken);
-                // Ensure cookie is set with expiration so middleware can always read it
-                document.cookie = `adminToken=${data.accessToken}; path=/; max-age=86400; SameSite=Lax; Secure`;
+                // Store the token in the adminToken cookie (read by the route guard
+                // in middleware.ts and attached as the Authorization header).
+                setToken(data.accessToken);
                 toast.success("Login successful! Redirecting...");
                 setTimeout(() => router.push("/admin/dashboard"), 1500);
             } else {

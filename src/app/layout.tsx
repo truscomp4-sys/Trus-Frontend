@@ -12,16 +12,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'TrusComp - Compliance Engineered for Confidence',
     description: 'Technology-driven labor law compliance solutions for businesses across India.',
-    url: 'https://truscomp.com',
+    url: 'https://www.truscomp.com',
     siteName: 'TrusComp',
-    images: [{ url: 'https://truscomp.com/og-image.jpg' }],
+    images: [{ url: 'https://www.truscomp.com/og-image.jpg' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'TrusComp - Labor Law Compliance Solutions',
     description: 'Technology-driven labor law compliance solutions for businesses across India.',
-    images: ['https://truscomp.com/og-image.jpg'],
+    images: ['https://www.truscomp.com/og-image.jpg'],
   },
 }
 

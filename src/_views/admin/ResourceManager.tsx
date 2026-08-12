@@ -48,7 +48,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { DateRange, useNavigation, CaptionProps } from "react-day-picker";
-import { authenticatedFetch } from "@/lib/utils";
+import { authenticatedFetch, handleDocumentDownload } from "@/lib/utils";
 
 interface Resource {
     id: number;
@@ -126,11 +126,14 @@ const ResourceManager = () => {
 
     // Initialize activeTab from URL param if present, otherwise default to first category
     const [activeTab, setActiveTab] = useState(() => {
-        const params = new URLSearchParams(window.location.search);
-        const categoryParam = params.get('category');
-        return categoryParam && CATEGORIES.find(c => c.id === categoryParam)
-            ? categoryParam
-            : CATEGORIES[0].id;
+        if (typeof window !== "undefined") {
+            const params = new URLSearchParams(window.location.search);
+            const categoryParam = params.get('category');
+            if (categoryParam && CATEGORIES.find(c => c.id === categoryParam)) {
+                return categoryParam;
+            }
+        }
+        return CATEGORIES[0].id;
     });
 
     // Standard Resource State
@@ -227,8 +230,8 @@ const ResourceManager = () => {
 
     useEffect(() => {
         // Update URL when activeTab changes (optional but good for UX persistence)
-        const params = new URLSearchParams(window.location.search);
-        if (activeTab) {
+        if (typeof window !== "undefined" && activeTab) {
+            const params = new URLSearchParams(window.location.search);
             params.set('category', activeTab);
             window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
         }
@@ -960,7 +963,7 @@ const ResourceManager = () => {
                                     <div className="flex items-center gap-3">
                                         <Input type="file" accept=".pdf,.doc,.docx" onChange={handleFileUpload} className="h-9 text-xs cursor-pointer" />
                                         {selectedResource.download_url && (
-                                            <Button type="button" variant="secondary" size="sm" className="h-9 px-3 gap-2 text-xs" onClick={() => window.open(selectedResource.download_url, '_blank')}>
+                                            <Button type="button" variant="secondary" size="sm" className="h-9 px-3 gap-2 text-xs" onClick={() => handleDocumentDownload(selectedResource.download_url, selectedResource.title)}>
                                                 <FileText className="w-3.5 h-3.5" /> View
                                             </Button>
                                         )}

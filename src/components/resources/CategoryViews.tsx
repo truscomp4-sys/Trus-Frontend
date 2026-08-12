@@ -826,16 +826,23 @@ export const RulesView = () => {
                 </div>
 
                 {/* Floating nodes */}
-                {[...Array(6)].map((_, i) => (
+                {[
+                    { left: "12%", top: "20%", x: [0, 50], y: [0, 30], duration: 12 },
+                    { left: "78%", top: "15%", x: [0, -40], y: [0, 40], duration: 15 },
+                    { left: "25%", top: "70%", x: [0, 30], y: [0, -30], duration: 14 },
+                    { left: "85%", top: "75%", x: [0, -50], y: [0, -40], duration: 18 },
+                    { left: "45%", top: "35%", x: [0, 20], y: [0, 50], duration: 16 },
+                    { left: "60%", top: "80%", x: [0, -30], y: [0, -20], duration: 13 },
+                ].map((node, i) => (
                     <motion.div
                         key={i}
                         className="absolute w-4 h-4 rounded-full bg-primary/20 blur-md"
                         animate={{
-                            x: [Math.random() * 100, Math.random() * 100],
-                            y: [Math.random() * 100, Math.random() * 100],
+                            x: node.x,
+                            y: node.y,
                         }}
-                        transition={{ duration: 10 + Math.random() * 10, repeat: Infinity, repeatType: "reverse" }}
-                        style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+                        transition={{ duration: node.duration, repeat: Infinity, repeatType: "reverse" }}
+                        style={{ left: node.left, top: node.top }}
                     />
                 ))}
             </div>

@@ -8,7 +8,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       allow: '/',
       disallow: ['/admin', '/api'],
     },
-    sitemap: 'https://truscomp.com/sitemap.xml',
+    sitemap: 'https://www.truscomp.com/sitemap.xml',
   }
 
   if (!API) return defaultRules
@@ -22,7 +22,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         const lines = text.split('\n')
         const rules: any[] = []
         let currentRule: any = null
-        let sitemapUrl = 'https://truscomp.com/sitemap.xml'
+        let sitemapUrl = 'https://www.truscomp.com/sitemap.xml'
 
         for (const line of lines) {
           const trimmed = line.trim()

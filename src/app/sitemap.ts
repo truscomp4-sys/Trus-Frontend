@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = 'https://truscomp.com'
+const BASE_URL = 'https://www.truscomp.com'
 const API = process.env.NEXT_PUBLIC_API_BASE_URL
 
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 8000) {

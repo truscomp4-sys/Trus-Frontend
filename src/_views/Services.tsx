@@ -45,27 +45,32 @@ const Services = () => {
 
             {/* Unique Motion Element: Kinetic Particle Field */}
             <div className="absolute inset-0 pointer-events-none">
-              {hasMounted && [...Array(20)].map((_, i) => (
+              {hasMounted && [
+                { size: 5, left: "15%", top: "25%", x: [0, 20, 0], duration: 18, delay: 0 },
+                { size: 4, left: "80%", top: "35%", x: [0, -15, 0], duration: 22, delay: 2 },
+                { size: 6, left: "30%", top: "70%", x: [0, 25, 0], duration: 16, delay: 4 },
+                { size: 3, left: "75%", top: "80%", x: [0, -20, 0], duration: 24, delay: 1 },
+              ].map((p, i) => (
                 <motion.div
                   key={i}
                   className="absolute rounded-full bg-primary/20"
                   style={{
-                    width: Math.random() * 4 + 2,
-                    height: Math.random() * 4 + 2,
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
+                    width: p.size,
+                    height: p.size,
+                    left: p.left,
+                    top: p.top,
                   }}
                   animate={{
                     y: [0, -100, 0],
-                    x: [0, Math.random() * 50 - 25, 0],
+                    x: p.x,
                     opacity: [0, 0.4, 0],
                     scale: [0, 1.5, 0],
                   }}
                   transition={{
-                    duration: 15 + Math.random() * 10,
+                    duration: p.duration,
                     repeat: Infinity,
                     ease: "easeInOut",
-                    delay: Math.random() * 10,
+                    delay: p.delay,
                   }}
                 />
               ))}

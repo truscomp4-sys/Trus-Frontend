@@ -15,6 +15,19 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**' },
     ],
   },
+  // Canonical host: permanently (308) redirect the non-www apex domain to www
+  // so the site is not served/indexed on both truscomp.com and www.truscomp.com.
+  // Fixes the duplicate meta title/description/canonical issues.
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'truscomp.com' }],
+        destination: 'https://www.truscomp.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 export default nextConfig

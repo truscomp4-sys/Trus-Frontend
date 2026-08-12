@@ -1,11 +1,12 @@
 'use client'
 
+import React, { useState, useEffect } from 'react';
 import { ResourceItem } from "@/data/resourcesData";
 import { Download, Calendar, MapPin, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import * as Icons from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import * as React from "react";
+import { handleDocumentDownload } from "@/lib/utils";
 
 interface ResourceListProps {
     resources: ResourceItem[];
@@ -13,7 +14,7 @@ interface ResourceListProps {
 
 const ResourceList = ({ resources }: ResourceListProps) => {
     // Pagination State
-    const [currentPage, setCurrentPage] = React.useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
     const router = useRouter();
 
@@ -21,7 +22,7 @@ const ResourceList = ({ resources }: ResourceListProps) => {
     const paginatedResources = resources.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     // Reset page when resources change
-    React.useEffect(() => {
+    useEffect(() => {
         setCurrentPage(1);
     }, [resources]);
 
@@ -79,7 +80,7 @@ const ResourceList = ({ resources }: ResourceListProps) => {
                                 ) : (
                                     <button
                                         disabled={!resource.downloadUrl}
-                                        onClick={() => resource.downloadUrl && window.open(resource.downloadUrl, '_blank')}
+                                        onClick={() => resource.downloadUrl && handleDocumentDownload(resource.downloadUrl, resource.title)}
                                         className={`flex-shrink-0 flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white rounded-lg transition-all shadow-lg ${resource.downloadUrl
                                             ? "bg-[#FF8C00] hover:bg-orange-600 shadow-orange-500/20 group-hover:shadow-orange-500/30 group-hover:-translate-y-0.5 cursor-pointer"
                                             : "bg-gray-300 cursor-not-allowed opacity-70 shadow-none scale-100"

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from "framer-motion";
 import { ArrowLeft, Download, Play, Calendar, FileText, CheckCircle2, User, ChevronRight, ArrowRight, Sparkles, Copy, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, handleDocumentDownload } from "@/lib/utils";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import { useState, useEffect } from "react";
@@ -351,7 +351,7 @@ const MonthlyLabourLawDetail = ({ id }: { id: string }) => {
                                         </div>
 
                                         <button
-                                            onClick={() => window.open(doc.url, '_blank')}
+                                            onClick={() => handleDocumentDownload(doc.url, doc.title || 'Labour_Law_Document')}
                                             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 hover:bg-[#FF8C00] hover:text-white hover:border-[#FF8C00] transition-all group-active:scale-[0.95]"
                                         >
                                             <span>Download</span>

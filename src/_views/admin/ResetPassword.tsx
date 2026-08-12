@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import logo from "@/assets/truscomp-logo-full.png";
 
 const ResetPassword = () => {
-    const [searchParams] = useSearchParams();
+    const searchParams = useSearchParams();
     const token = searchParams.get("token");
     const router = useRouter();
 
@@ -26,7 +26,7 @@ const ResetPassword = () => {
             toast.error("Invalid or missing reset token.");
             router.push("/admin/login");
         }
-    }, [token, navigate]);
+    }, [token, router]);
 
     const handleReset = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -91,7 +91,7 @@ const ResetPassword = () => {
                             {/* Header */}
                             <div className="text-center space-y-4">
                                 <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
-                                    <img src={logo} alt="TrusComp Logo" className="h-16 mx-auto drop-shadow-2xl" />
+                                    <img src={logo.src} alt="TrusComp Logo" className="h-16 mx-auto drop-shadow-2xl" />
                                 </Link>
                                 <div className="space-y-2">
                                     <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-md">Reset Password</h1>
