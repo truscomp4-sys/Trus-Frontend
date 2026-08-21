@@ -438,7 +438,7 @@ const Contact = () => {
                   </h4>
                 </div>
 
-                <div className="space-y-4">
+                {/* <div className="space-y-4">
                   <div>
                     <h3 className="text-3xl font-display font-bold text-white tracking-tight">Mr. MV Prakash</h3>
                     <p className="text-primary text-sm font-semibold mt-1">Senior Vice President</p>
@@ -463,7 +463,7 @@ const Contact = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Vertical Divider (Desktop Only) */}
               <div className="hidden lg:block w-px h-32 bg-slate-800" />
