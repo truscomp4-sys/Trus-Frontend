@@ -466,7 +466,7 @@ const Contact = () => {
                   <p className="text-xs text-slate-400 max-w-[200px] leading-relaxed">Have urgent compliance questions? Chat with our experts directly for instant support.</p>
                 </div>
                 <Button
-                  onClick={() => window.open('https://wa.me/919743883000', '_blank')}
+                  onClick={() => window.open('https://wa.me/919080966206', '_blank')}
                   className="bg-[#25D366] hover:bg-[#20ba59] text-white border-0 h-12 px-8 rounded-xl font-bold transition-all shadow-xl shadow-emerald-500/10 group/wa w-full sm:w-auto"
                 >
                   <MessageCircle className="w-5 h-5 mr-2 group-hover/wa:rotate-12 transition-transform" />
