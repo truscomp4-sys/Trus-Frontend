@@ -462,8 +462,8 @@ const Contact = () => {
                       </a>
                     </div>
                   </div>
-                </div>
-              </div> */}
+                </div>*/}
+              </div> 
 
               {/* Vertical Divider (Desktop Only) */}
               <div className="hidden lg:block w-px h-32 bg-slate-800" />
