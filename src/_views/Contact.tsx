@@ -438,31 +438,7 @@ const Contact = () => {
                   </h4>
                 </div>
 
-                {/* <div className="space-y-4">
-                  <div>
-                    <h3 className="text-3xl font-display font-bold text-white tracking-tight">Mr. MV Prakash</h3>
-                    <p className="text-primary text-sm font-semibold mt-1">Senior Vice President</p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 pt-2">
-                    <div className="flex items-center gap-3 group/item">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-all duration-300">
-                        <Phone className="w-5 h-5" />
-                      </div>
-                      <a href="tel:+919743883000" className="text-sm text-slate-300 hover:text-white transition-colors font-medium">
-                        +91 97438 83000
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-3 group/item">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-all duration-300">
-                        <Mail className="w-5 h-5" />
-                      </div>
-                      <a href="mailto:prakash@truscomp.com" className="text-base text-slate-300 hover:text-white transition-colors font-medium">
-                        prakash@truscomp.com
-                      </a>
-                    </div>
-                  </div>
-                </div>*/}
+                
               </div> 
 
               {/* Vertical Divider (Desktop Only) */}
