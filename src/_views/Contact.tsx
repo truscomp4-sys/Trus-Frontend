@@ -25,7 +25,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MapPin, Send, CheckCircle2, X, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSEO } from "@/hooks/useSEO";
-import qrCode from "@/assets/qr.png";
 
 interface Service {
   id: number;
@@ -417,7 +416,65 @@ const Contact = () => {
             </div>
           </div>
 
-          
+          {/* Connect with Our Team - Full Width Horizontal Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-16 lg:mt-24 mb-6 lg:mb-12 bg-slate-900 text-white rounded-3xl p-8 lg:p-12 shadow-2xl shadow-slate-900/20 relative overflow-hidden group"
+          >
+            {/* Background Decals */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-full -mr-20 -mt-20 group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-tr-full -ml-8 -mb-8 group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
+
+            <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 relative z-10">
+              {/* Contact Person Details */}
+              <div className="flex-grow space-y-6 text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <h4 className="font-display font-semibold text-white tracking-widest uppercase text-[10px]">
+                    Connect with Our Team
+                  </h4>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-3xl font-display font-bold text-white tracking-tight">Ms. Swetha</h3>
+                    <p className="text-primary text-sm font-semibold mt-1">Business Development</p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 pt-2">
+                    <div className="flex items-center gap-3 group/item">
+                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-all duration-300">
+                        <Phone className="w-5 h-5" />
+                      </div>
+                      <a href="tel:+919080966206" className="text-sm text-slate-300 hover:text-white transition-colors font-medium">
+                        90809 66206
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vertical Divider (Desktop Only) */}
+              <div className="hidden lg:block w-px h-32 bg-slate-800" />
+
+              {/* WhatsApp Call to Action */}
+              <div className="flex-shrink-0 flex flex-col items-center lg:items-start gap-4">
+                <div className="text-center lg:text-left">
+                  <p className="text-lg font-display font-bold text-white mb-1">Quick WhatsApp Access</p>
+                  <p className="text-xs text-slate-400 max-w-[200px] leading-relaxed">Have urgent compliance questions? Chat with our experts directly for instant support.</p>
+                </div>
+                <Button
+                  onClick={() => window.open('https://wa.me/919743883000', '_blank')}
+                  className="bg-[#25D366] hover:bg-[#20ba59] text-white border-0 h-12 px-8 rounded-xl font-bold transition-all shadow-xl shadow-emerald-500/10 group/wa w-full sm:w-auto"
+                >
+                  <MessageCircle className="w-5 h-5 mr-2 group-hover/wa:rotate-12 transition-transform" />
+                  Message on WhatsApp
+                </Button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
