@@ -694,6 +694,31 @@ const ServicesManager = () => {
                                     </div>
 
                                     <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Page URL</label>
+                                        <div className="flex items-center h-11 rounded-xl border border-slate-200 bg-white focus-within:ring-4 focus-within:ring-primary/5 transition-all overflow-hidden">
+                                            <span className="pl-3 pr-1 text-xs font-bold text-slate-400 select-none shrink-0">/services/</span>
+                                            <Input
+                                                value={editingService.slug}
+                                                onChange={e => setEditingService({
+                                                    ...editingService,
+                                                    // Keep it URL-safe as it is typed.
+                                                    slug: e.target.value
+                                                        .toLowerCase()
+                                                        .replace(/[^\w\s-]/g, '')
+                                                        .replace(/[\s_]+/g, '-')
+                                                        .replace(/-+/g, '-')
+                                                })}
+                                                placeholder="auto-generated from the title"
+                                                className="h-full border-0 pl-0 font-bold rounded-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                                            />
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                                            Leave blank to generate it from the title. Changing this changes the
+                                            page address, and any existing links to the old address will break.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Classification Category</label>
                                             <Button
