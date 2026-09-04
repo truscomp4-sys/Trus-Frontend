@@ -37,6 +37,10 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
     const pathname = usePathname();
     const isServicesActive = pathname.startsWith("/services");
 
+    // GCC is managed as a normal service in the CMS. Until that row exists the
+    // link is added manually, so check first to avoid listing it twice.
+    const hasGccService = services.some((s: any) => s.slug === "gcc");
+
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -119,15 +123,17 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                                     </Link>
                                 </div>
                             ))}
-                            <div className="break-inside-avoid md:mb-1">
-                                <Link
-                                    href="/services/gcc"
-                                    onClick={() => setIsOpen(false)}
-                                    className="block px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200"
-                                >
-                                    GCC
-                                </Link>
-                            </div>
+                            {!hasGccService && (
+                                <div className="break-inside-avoid md:mb-1">
+                                    <Link
+                                        href="/services/gcc"
+                                        onClick={() => setIsOpen(false)}
+                                        className="block px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200"
+                                    >
+                                        GCC
+                                    </Link>
+                                </div>
+                            )}
                             <div className="break-inside-avoid mt-2 md:mt-0 md:pt-2">
                                 <Link
                                     href="/services"
@@ -148,7 +154,9 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
     const desktopColumns = [];
     const desktopItems = [...services];
     // Add GCC and Explore All to the list of items to render in the grid
-    desktopItems.push({ id: 'gcc-item', title: 'Global Capability Center (GCC)', slug: 'gcc' });
+    if (!hasGccService) {
+        desktopItems.push({ id: 'gcc-item', title: 'Global Capability Center (GCC)', slug: 'gcc' });
+    }
     desktopItems.push({ id: 'explore-all', title: 'Explore All Services →', slug: '', isAction: true });
 
     const itemsPerColumn = Math.ceil(desktopItems.length / 4);

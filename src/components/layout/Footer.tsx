@@ -22,6 +22,13 @@ const Footer = () => {
     { name: "Contact Us", path: "/contact" },
   ];
 
+  const complianceServices = [
+    { name: "Labour Law Compliance", path: "/services/end-to-end-labor-law-compliance-management" },
+    { name: "Payroll Compliance", path: "/services/payroll-compliance" },
+    { name: "Vendor Compliance", path: "/services/vendor-audit" },
+    { name: "Factory Compliance", path: "/services/factory-compliance-solutions" },
+  ];
+
   return (
     <footer className="relative bg-foreground text-background overflow-hidden">
       {/* Subtle Background Texture */}
@@ -33,7 +40,7 @@ const Footer = () => {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
       <div className="section-container py-12 lg:py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Company Info */}
           <div className="lg:col-span-1">
             <img src={settings?.website_logo || logo.src} alt="TrusComp" className="h-10 w-auto mb-4 brightness-0 invert" />
@@ -110,6 +117,23 @@ const Footer = () => {
             <h4 className="font-display font-semibold mb-4">Resources</h4>
             <ul className="space-y-2">
               {resourceLinks.map((link) => (
+                <li key={link.path}>
+                  <Link
+                    href={link.path}
+                    className="text-sm text-background/70 hover:text-primary transition-colors duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Compliance Services */}
+          <div>
+            <h4 className="font-display font-semibold mb-4">Compliance Services</h4>
+            <ul className="space-y-2">
+              {complianceServices.map((link) => (
                 <li key={link.path}>
                   <Link
                     href={link.path}

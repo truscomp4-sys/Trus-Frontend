@@ -20,62 +20,126 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSEO } from "@/hooks/useSEO";
+import { useEffect, useState } from "react";
+
+// Icons stay in code — the CMS supplies the text, the design supplies the art.
+// Each list falls back to the last icon if the admin adds more rows than icons.
+const SETUP_ICONS = [
+    <Building2 className="w-6 h-6" />,
+    <FileText className="w-6 h-6" />,
+    <Globe2 className="w-6 h-6" />,
+    <Briefcase className="w-6 h-6" />,
+    <SearchCheck className="w-6 h-6" />,
+];
+
+const TECH_ICONS = [
+    <LayoutDashboard className="w-8 h-8 text-primary" />,
+    <Bell className="w-8 h-8 text-primary" />,
+    <FileText className="w-8 h-8 text-primary" />,
+];
+
+const WHY_ICONS = [
+    <FileText />,
+    <LayoutDashboard />,
+    <Globe2 />,
+    <TrendingUp />,
+    <Users2 />,
+];
+
+const pick = (icons: JSX.Element[], i: number) => icons[i] ?? icons[icons.length - 1];
 
 const GCC = () => {
     useSEO("service", "gcc");
 
-    const stats = [
-        { label: "GCCs in India", value: "1,800+" },
-        { label: "Professionals Employed", value: "2 Million" },
-        { label: "Growth Projected", value: "by 2030" },
-        { label: "Compliance Focus", value: "End-to-End" }
-    ];
+    // Content is managed as the 'gcc' service in the admin panel. The hard-coded
+    // values below are the fallback, so the page still renders correctly if the
+    // request fails or the service has not been seeded yet.
+    const [service, setService] = useState<any>(null);
 
-    const setupToScaleFeatures = [
-        {
-            title: "GCC Compliance Advisory & Structuring",
-            desc: "Strategic guidance on statutory registrations, labour applicability, and workforce classification under new Labour Codes.",
-            icon: <Building2 className="w-6 h-6" />
-        },
-        {
-            title: "Salary Restructuring & Wage Code Alignment",
-            desc: "Ensuring compliance with wage definitions, PF/ESIC calculations, bonus, gratuity, and overtime provisions.",
-            icon: <FileText className="w-6 h-6" />
-        },
-        {
-            title: "Multi-State Statutory Compliance Management",
-            desc: "PF, ESIC, CLRA, Shops & Establishments, POSH, and state-specific labour law compliance.",
-            icon: <Globe2 className="w-6 h-6" />
-        },
-        {
-            title: "Contract Labour & Workforce Advisory",
-            desc: "Licensing, inter-state migrant worker applicability, gig/platform worker advisory, and risk mitigation.",
-            icon: <Briefcase className="w-6 h-6" />
-        },
-        {
-            title: "Exit & Audit Compliance Review",
-            desc: "Final settlement verification and statutory timeline adherence.",
-            icon: <SearchCheck className="w-6 h-6" />
-        }
-    ];
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+                const res = await fetch(`${apiBase}/services/gcc`);
+                if (res.ok) setService(await res.json());
+            } catch (err) {
+                console.error("Failed to load GCC service content:", err);
+            }
+        };
+        load();
+    }, []);
 
-    const technologyFeatures = [
-        {
-            title: "Technology-backed Dashboards",
-            desc: "Real-time visibility into compliance status across all locations.",
-            icon: <LayoutDashboard className="w-8 h-8 text-primary" />
-        },
-        {
-            title: "Monthly Labour Law Updates",
-            desc: "Stay ahead of regulatory changes with our curated monthly intelligence.",
-            icon: <Bell className="w-8 h-8 text-primary" />
-        },
-        {
-            title: "Structured Reporting Systems",
-            desc: "Comprehensive audit trails and governance reports for global stakeholders.",
-            icon: <FileText className="w-8 h-8 text-primary" />
-        }
-    ];
+    const stats: { label: string; value: string }[] =
+        service?.stats?.length
+            ? service.stats
+            : [
+                { label: "GCCs in India", value: "1,800+" },
+                { label: "Professionals Employed", value: "2 Million" },
+                { label: "Growth Projected", value: "by 2030" },
+                { label: "Compliance Focus", value: "End-to-End" }
+            ];
+
+    const setupToScaleFeatures = (
+        service?.features?.length
+            ? service.features.map((f: any) => ({ title: f.title, desc: f.hint }))
+            : [
+                { title: "GCC Compliance Advisory & Structuring", desc: "Strategic guidance on statutory registrations, labour applicability, and workforce classification under new Labour Codes." },
+                { title: "Salary Restructuring & Wage Code Alignment", desc: "Ensuring compliance with wage definitions, PF/ESIC calculations, bonus, gratuity, and overtime provisions." },
+                { title: "Multi-State Statutory Compliance Management", desc: "PF, ESIC, CLRA, Shops & Establishments, POSH, and state-specific labour law compliance." },
+                { title: "Contract Labour & Workforce Advisory", desc: "Licensing, inter-state migrant worker applicability, gig/platform worker advisory, and risk mitigation." },
+                { title: "Exit & Audit Compliance Review", desc: "Final settlement verification and statutory timeline adherence." }
+            ]
+    ).map((f: any, i: number) => ({ ...f, icon: pick(SETUP_ICONS, i) }));
+
+    const technologyFeatures = (
+        service?.benefits?.length
+            ? service.benefits.map((b: any) => ({ title: b.keyword, desc: b.text }))
+            : [
+                { title: "Technology-backed Dashboards", desc: "Real-time visibility into compliance status across all locations." },
+                { title: "Monthly Labour Law Updates", desc: "Stay ahead of regulatory changes with our curated monthly intelligence." },
+                { title: "Structured Reporting Systems", desc: "Comprehensive audit trails and governance reports for global stakeholders." }
+            ]
+    ).map((f: any, i: number) => ({ ...f, icon: pick(TECH_ICONS, i) }));
+
+    const keyOutcomes: string[] = service?.problems?.length
+        ? service.problems
+        : [
+            "Reduce statutory risk and audit exposure",
+            "Maintain wage and social security compliance under evolving Labour Codes",
+            "Build scalable payroll and governance frameworks",
+            "Operate seamlessly across multiple states"
+        ];
+
+    const whyChoose = (
+        service?.whyTrusComp?.length
+            ? service.whyTrusComp
+            : [
+                "Labour Codes Expertise",
+                "Compliance Dashboards",
+                "Multi-State Management",
+                "Wage-Aligned Structuring",
+                "Large Support Capacity"
+            ]
+    ).map((title: string, i: number) => ({ title, icon: pick(WHY_ICONS, i) }));
+
+    const heroSubtitle = service?.overview || service?.short_overview ||
+        "Delivering end-to-end Labour Code, payroll, and statutory compliance frameworks for scalable Global Capability Centres in India.";
+
+    const aboutParagraphs: string[] = service?.long_overview
+        ? String(service.long_overview).split(/\r?\n+/).map((t: string) => t.trim()).filter(Boolean)
+        : [
+            "Global Capability Centres (GCCs) in India are rapidly evolving from cost-arbitrage support units into strategic hubs driving innovation, governance, and enterprise leadership.",
+            "As multinational corporations expand their India footprint, compliance complexity across labour laws, multi-state operations, and workforce structuring has become a critical priority."
+        ];
+
+    const quoteText = service?.quote ||
+        "GCC growth without compliance architecture creates silent risk. Our role is to ensure that enterprises expanding in India build legally resilient and audit-ready workforce structures from day one.";
+
+    // Attribution is stored as one string; the first comma splits name from role.
+    const attribution = service?.quote_author || "Mr. Anand Gopalan, Knowledge Partner, TrusComp";
+    const commaAt = attribution.indexOf(",");
+    const quoteName = commaAt === -1 ? attribution : attribution.slice(0, commaAt).trim();
+    const quoteRole = commaAt === -1 ? "" : attribution.slice(commaAt + 1).trim();
 
     return (
         <Layout>
@@ -103,7 +167,7 @@ const GCC = () => {
                                 TrusComp Strengthens India’s <span className="text-primary">GCC Ecosystem</span> with Compliance-First Solutions
                             </h1>
                             <p className="text-xl md:text-2xl text-white/70 mb-10 leading-relaxed font-light">
-                                Delivering end-to-end Labour Code, payroll, and statutory compliance frameworks for scalable Global Capability Centres in India.
+                                {heroSubtitle}
                             </p>
                             <div className="flex flex-wrap gap-4">
                                 <Link
@@ -136,12 +200,9 @@ const GCC = () => {
                                 The Evolution of GCCs in India
                             </h2>
                             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-                                <p>
-                                    Global Capability Centres (GCCs) in India are rapidly evolving from cost-arbitrage support units into strategic hubs driving innovation, governance, and enterprise leadership.
-                                </p>
-                                <p>
-                                    As multinational corporations expand their India footprint, compliance complexity across labour laws, multi-state operations, and workforce structuring has become a critical priority.
-                                </p>
+                                {aboutParagraphs.map((para, i) => (
+                                    <p key={i}>{para}</p>
+                                ))}
                                 <p className="font-medium text-foreground italic">
                                     "This growth demands robust compliance architecture covering wage restructuring, PF/ESIC, gratuity, and multi-state statutory governance."
                                 </p>
@@ -263,12 +324,7 @@ const GCC = () => {
                                 <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
                                     <ShieldCheck className="w-8 h-8 text-primary" /> Key Outcomes
                                 </h3>
-                                {[
-                                    "Reduce statutory risk and audit exposure",
-                                    "Maintain wage and social security compliance under evolving Labour Codes",
-                                    "Build scalable payroll and governance frameworks",
-                                    "Operate seamlessly across multiple states"
-                                ].map((item, i) => (
+                                {keyOutcomes.map((item, i) => (
                                     <motion.div
                                         key={i}
                                         initial={{ opacity: 0, x: 20 }}
@@ -301,13 +357,13 @@ const GCC = () => {
                             <Quote className="w-20 h-20 text-primary/10 absolute -top-10 -left-10 rotate-12" />
                             <blockquote className="relative z-10">
                                 <p className="text-2xl md:text-4xl font-display font-semibold italic text-slate-800 dark:text-slate-200 mb-8 leading-relaxed">
-                                    “GCC growth without compliance architecture creates silent risk. Our role is to ensure that enterprises expanding in India build legally resilient and audit-ready workforce structures from day one.”
+                                    {`“${quoteText}”`}
                                 </p>
                                 <footer className="mt-8 flex flex-col items-center">
                                     <div className="w-16 h-1 bg-primary mb-4 rounded-full" />
                                     <cite className="not-italic">
-                                        <span className="block text-xl font-bold text-foreground">Mr. Anand Gopalan</span>
-                                        <span className="text-primary font-medium">Knowledge Partner, TrusComp</span>
+                                        <span className="block text-xl font-bold text-foreground">{quoteName}</span>
+                                        {quoteRole && <span className="text-primary font-medium">{quoteRole}</span>}
                                     </cite>
                                 </footer>
                             </blockquote>
@@ -321,13 +377,7 @@ const GCC = () => {
                         <div className="grid lg:grid-cols-2 gap-16 items-center">
                             <div className="order-2 lg:order-1">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    {[
-                                        { title: "Labour Codes Expertise", icon: <FileText /> },
-                                        { title: "Compliance Dashboards", icon: <LayoutDashboard /> },
-                                        { title: "Multi-State Management", icon: <Globe2 /> },
-                                        { title: "Wage-Aligned Structuring", icon: <TrendingUp /> },
-                                        { title: "Large Support Capacity", icon: <Users2 /> }
-                                    ].map((item, i) => (
+                                    {whyChoose.map((item: any, i: number) => (
                                         <div key={i} className="flex items-center gap-4 p-5 rounded-xl bg-card border border-border hover:shadow-md transition-shadow">
                                             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                                                 {item.icon}
