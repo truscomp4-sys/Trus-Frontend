@@ -173,9 +173,7 @@ const Contact = () => {
             {/* Contact Form (Zoho Forms embed -> Zoho CRM Leads) */}
             <div className="lg:col-span-3">
               <div className="dashboard-card p-8">
-                <h3 className="text-xl font-display font-semibold text-foreground mb-6">
-                  Compliance Enquiry Form
-                </h3>
+             
                 <iframe
                   title="TrusComp Compliance Enquiry Form"
                   aria-label="TrusComp-Website"
