@@ -180,7 +180,8 @@ const Contact = () => {
                   title="TrusComp Compliance Enquiry Form"
                   aria-label="TrusComp-Website"
                   src={ZOHO_FORM_URL}
-                  style={{ height: "1000px", width: "100%", border: "none" }}
+                  scrolling="no"
+                  style={{ height: "1150px", width: "100%", border: "none", overflow: "hidden" }}
                   loading="lazy"
                 />
               </div>
