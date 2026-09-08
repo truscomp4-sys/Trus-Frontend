@@ -1,13 +1,13 @@
 'use client'
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Save, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 // The chrome every page-content manager shares: a header that stays put while
-// you scroll a long form, jump links to each section, and a guard so edits are
-// not lost by navigating away.
+// you scroll, tabs that show one section at a time so the form never runs to
+// several screens, and a guard so edits are not lost by navigating away.
 
 export interface ShellSection {
     id: string;
@@ -85,8 +85,23 @@ export const ContentManagerShell = ({
 }) => {
     useUnsavedChangesWarning(isDirty && !isSaving);
 
-    const jumpTo = (id: string) => {
-        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // One section at a time: these forms run to several screens, and an editor
+    // works on one block at a time anyway. Every section stays mounted in the
+    // manager's state, so Save always writes the whole record.
+    const [activeSection, setActiveSection] = useState(sections[0]?.id ?? "");
+
+    const visibleChildren = React.Children.toArray(children).filter((child) => {
+        if (sections.length <= 1) return true;
+        if (!React.isValidElement(child)) return true;
+
+        const id = (child.props as { id?: string }).id;
+        // A child without an id is chrome rather than a section — always show it.
+        return !id || id === activeSection;
+    });
+
+    const showSection = (id: string) => {
+        setActiveSection(id);
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     return (
@@ -123,15 +138,21 @@ export const ContentManagerShell = ({
                         </div>
                     </div>
 
-                    {/* Jump links — horizontal so they work at every width */}
+                    {/* Section tabs — horizontal so they work at every width */}
                     {!isLoading && sections.length > 1 && (
                         <div className="flex gap-1.5 overflow-x-auto pb-2.5 -mb-px custom-scrollbar">
                             {sections.map((section) => (
                                 <button
                                     key={section.id}
                                     type="button"
-                                    onClick={() => jumpTo(section.id)}
-                                    className="shrink-0 text-xs font-medium text-slate-500 hover:text-primary hover:bg-primary/5 border border-slate-200 hover:border-primary/30 rounded-full px-3 py-1 transition-colors"
+                                    onClick={() => showSection(section.id)}
+                                    aria-current={section.id === activeSection}
+                                    className={cn(
+                                        "shrink-0 text-xs font-medium rounded-full px-3 py-1 border transition-colors",
+                                        section.id === activeSection
+                                            ? "bg-primary/10 text-primary border-primary/30"
+                                            : "text-slate-500 border-slate-200 hover:text-primary hover:bg-primary/5 hover:border-primary/30"
+                                    )}
                                 >
                                     {section.label}
                                 </button>
@@ -149,7 +170,7 @@ export const ContentManagerShell = ({
                         <RefreshCw className="w-5 h-5 animate-spin mr-2" /> Loading…
                     </div>
                 ) : (
-                    <div className="space-y-6">{children}</div>
+                    <div className="space-y-6">{visibleChildren}</div>
                 )}
             </div>
         </div>
