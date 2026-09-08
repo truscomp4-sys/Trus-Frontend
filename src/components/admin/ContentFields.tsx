@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useRef, useState } from "react";
-import { Plus, Trash2, RefreshCw, Upload, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Trash2, RefreshCw, Upload, ArrowUp, ArrowDown, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { authenticatedFetch } from "@/lib/utils";
+import { authenticatedFetch, cn } from "@/lib/utils";
 
 // Shared form primitives for the page-content managers (About, Home). They all
 // edit a single settings key made of nested records and lists, so the same few
@@ -97,7 +97,13 @@ export const StringList = ({
     </div>
 );
 
-/** Repeating group of records with add / remove / reorder controls. */
+/**
+ * Repeating group of records with add / remove / reorder controls.
+ *
+ * Rows are collapsed to a single summary line and open one at a time: a list of
+ * six services with four fields each would otherwise be several screens of
+ * scrolling to reach the last one.
+ */
 export function Repeater<T>({
     label,
     hint,
@@ -105,6 +111,7 @@ export function Repeater<T>({
     blank,
     onChange,
     renderItem,
+    itemLabel,
 }: {
     label: string;
     hint?: string;
@@ -112,13 +119,33 @@ export function Repeater<T>({
     blank: () => T;
     onChange: (next: T[]) => void;
     renderItem: (item: T, update: (patch: Partial<T>) => void) => React.ReactNode;
+    /** Summary shown on the collapsed row. Falls back to the row number. */
+    itemLabel?: (item: T, index: number) => string;
 }) {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
     const move = (index: number, dir: -1 | 1) => {
         const target = index + dir;
         if (target < 0 || target >= items.length) return;
         const next = [...items];
         [next[index], next[target]] = [next[target], next[index]];
         onChange(next);
+        // Follow the row that moved, so the open one stays open.
+        setOpenIndex((current) => (current === index ? target : current === target ? index : current));
+    };
+
+    const remove = (index: number) => {
+        onChange(items.filter((_, i) => i !== index));
+        setOpenIndex((current) => {
+            if (current === null || current === index) return null;
+            return current > index ? current - 1 : current;
+        });
+    };
+
+    const add = () => {
+        onChange([...items, blank()]);
+        // A blank row is only useful open.
+        setOpenIndex(items.length);
     };
 
     return (
@@ -126,56 +153,87 @@ export function Repeater<T>({
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{label}</label>
             {hint && <p className="text-[11px] text-slate-400 -mt-2">{hint}</p>}
 
-            <div className="space-y-4">
-                {items.map((item, index) => (
-                    <div key={index} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-4">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                #{index + 1}
-                            </span>
-                            <div className="flex items-center gap-1">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-slate-400"
-                                    onClick={() => move(index, -1)}
-                                    disabled={index === 0}
-                                >
-                                    <ArrowUp className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-slate-400"
-                                    onClick={() => move(index, 1)}
-                                    disabled={index === items.length - 1}
-                                >
-                                    <ArrowDown className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-slate-400 hover:text-rose-600"
-                                    onClick={() => onChange(items.filter((_, i) => i !== index))}
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </Button>
-                            </div>
-                        </div>
+            <div className="space-y-2">
+                {items.map((item, index) => {
+                    const isOpen = openIndex === index;
+                    const summary = itemLabel?.(item, index)?.trim();
 
-                        {renderItem(item, (patch) => {
-                            const next = [...items];
-                            next[index] = { ...items[index], ...patch };
-                            onChange(next);
-                        })}
-                    </div>
-                ))}
+                    return (
+                        <div key={index} className="rounded-xl border border-slate-200 bg-slate-50/60 overflow-hidden">
+                            <div className="flex items-center gap-2 pr-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                                    aria-expanded={isOpen}
+                                    className="flex flex-1 items-center gap-2 min-w-0 px-4 py-3 text-left hover:bg-slate-100/70 transition-colors"
+                                >
+                                    <ChevronDown
+                                        className={cn(
+                                            "w-4 h-4 shrink-0 text-slate-400 transition-transform",
+                                            isOpen && "rotate-180"
+                                        )}
+                                    />
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0">
+                                        #{index + 1}
+                                    </span>
+                                    <span
+                                        className={cn(
+                                            "text-sm truncate",
+                                            summary ? "text-slate-700 font-medium" : "text-slate-400 italic"
+                                        )}
+                                    >
+                                        {summary || "Untitled"}
+                                    </span>
+                                </button>
+
+                                <div className="flex items-center gap-1 shrink-0">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-slate-400"
+                                        onClick={() => move(index, -1)}
+                                        disabled={index === 0}
+                                    >
+                                        <ArrowUp className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-slate-400"
+                                        onClick={() => move(index, 1)}
+                                        disabled={index === items.length - 1}
+                                    >
+                                        <ArrowDown className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-slate-400 hover:text-rose-600"
+                                        onClick={() => remove(index)}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {isOpen && (
+                                <div className="px-4 pb-4 pt-1 space-y-4 border-t border-slate-200">
+                                    {renderItem(item, (patch) => {
+                                        const next = [...items];
+                                        next[index] = { ...items[index], ...patch };
+                                        onChange(next);
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
-            <Button type="button" variant="outline" size="sm" onClick={() => onChange([...items, blank()])}>
+            <Button type="button" variant="outline" size="sm" onClick={add}>
                 <Plus className="w-3.5 h-3.5 mr-1.5" /> Add
             </Button>
         </div>

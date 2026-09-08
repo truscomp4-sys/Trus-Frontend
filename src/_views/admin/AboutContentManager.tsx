@@ -223,6 +223,7 @@ const AboutContentManager = () => {
                             label="Values"
                             hint="Pills laid out in a wrapping row — any number works."
                             items={core_values.values}
+                            itemLabel={(item) => item.label}
                             blank={() => ({ icon: "Heart" as ValueIconName, label: "", description: "" })}
                             onChange={(values) => patch("core_values", { values })}
                             renderItem={(item, update) => (
@@ -270,6 +271,7 @@ const AboutContentManager = () => {
                             label="Founders"
                             hint="Each one alternates left/right down the page."
                             items={leadership.founders}
+                            itemLabel={(item) => item.name}
                             blank={() => ({ name: "", role: "", image: "", description: "", expertise: [] })}
                             onChange={(founders) => patch("leadership", { founders })}
                             renderItem={(item, update) => (
@@ -315,6 +317,7 @@ const AboutContentManager = () => {
                             label="Operational Leadership"
                             hint="Laid out three per row on desktop."
                             items={leadership.leadership}
+                            itemLabel={(item) => item.name}
                             blank={() => ({ name: "", role: "" })}
                             onChange={(list) => patch("leadership", { leadership: list })}
                             renderItem={(item, update) => (
@@ -345,6 +348,7 @@ const AboutContentManager = () => {
                             label="Metrics"
                             hint="Three per row on desktop — keep to three for an even row."
                             items={impact.metrics}
+                            itemLabel={(item) => item.label}
                             blank={() => ({ number: "", label: "", description: "" })}
                             onChange={(metrics) => patch("impact", { metrics })}
                             renderItem={(item, update) => (
@@ -436,6 +440,7 @@ const AboutContentManager = () => {
                             label="Phases"
                             hint="The desktop timeline sizes itself to the number of phases. Past about eight the columns get cramped."
                             items={framework.phases}
+                            itemLabel={(item) => item.title}
                             blank={() => ({ step: "", title: "", range: "" })}
                             onChange={(phases) => patch("framework", { phases })}
                             renderItem={(item, update) => (
