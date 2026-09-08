@@ -1,12 +1,34 @@
 import type { MetadataRoute } from 'next'
 
+// Never crawlable, whatever the admin puts in the robots_txt setting.
+const PROTECTED_PATHS = ['/admin', '/api']
+
+// A robots.txt group only applies to the most specific matching user-agent, so
+// a bot with its own group ignores the rules under '*'. The protected paths are
+// therefore added to every group, and a '*' group is created if none exists.
+function enforceProtectedPaths(rules: any[]): any[] {
+  const guarded = rules.map(rule => ({
+    ...rule,
+    allow: (rule.allow ?? []).filter(Boolean),
+    disallow: Array.from(
+      new Set([...(rule.disallow ?? []).filter(Boolean), ...PROTECTED_PATHS])
+    ),
+  }))
+
+  if (!guarded.some(rule => rule.userAgent === '*')) {
+    guarded.unshift({ userAgent: '*', allow: ['/'], disallow: [...PROTECTED_PATHS] })
+  }
+
+  return guarded
+}
+
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const API = process.env.NEXT_PUBLIC_API_BASE_URL
   const defaultRules: MetadataRoute.Robots = {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/api'],
+      disallow: [...PROTECTED_PATHS],
     },
     sitemap: 'https://www.truscomp.com/sitemap.xml',
   }
@@ -52,7 +74,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
         if (rules.length > 0) {
           return {
-            rules,
+            rules: enforceProtectedPaths(rules),
             sitemap: sitemapUrl,
           }
         }

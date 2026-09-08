@@ -19,7 +19,9 @@ import {
     ChevronLeft,
     ChevronRight,
     MoreHorizontal,
-    HelpCircle
+    HelpCircle,
+    BarChart3,
+    Quote as QuoteIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +84,9 @@ interface ServiceItem {
     benefits: { keyword: string; text: string }[];
     whyTrusComp: string[];
     faqs: { question: string; answer: string }[];
+    stats: { label: string; value: string }[];
+    quote: string;
+    quote_author: string;
 }
 
 const EmptyService: ServiceItem = {
@@ -99,7 +104,10 @@ const EmptyService: ServiceItem = {
     features: [],
     benefits: [],
     whyTrusComp: [],
-    faqs: []
+    faqs: [],
+    stats: [],
+    quote: "",
+    quote_author: ""
 };
 
 const DOODLE_TYPES = ["shield", "audit", "records", "payroll", "license", "training", "vendor", "automation", "risk", "factory", "calendar", "remittance", "employer_audit", "contractor"];
@@ -273,7 +281,10 @@ const ServicesManager = () => {
                     features: fullService.features || [],
                     benefits: fullService.benefits || [],
                     whyTrusComp: fullService.whyTrusComp || [],
-                    faqs: fullService.faqs || []
+                    faqs: fullService.faqs || [],
+                    stats: fullService.stats || [],
+                    quote: fullService.quote || "",
+                    quote_author: fullService.quote_author || ""
                 });
                 setIsDialogOpen(true);
             } else {
@@ -294,6 +305,8 @@ const ServicesManager = () => {
         try {
             const payload = {
                 id: editingService.id,
+                // Sent so an existing page keeps its URL when the title is edited.
+                slug: editingService.slug || undefined,
                 title: editingService.title,
                 categoryId: editingService.category,
                 shortOverview: editingService.short_overview,
@@ -304,6 +317,9 @@ const ServicesManager = () => {
                 features: editingService.features || [],
                 benefits: editingService.benefits || [],
                 faqs: editingService.faqs || [],
+                stats: editingService.stats || [],
+                quote: editingService.quote || "",
+                quoteAuthor: editingService.quote_author || "",
                 doodleType: editingService.doodle_type,
                 isActive: editingService.is_visible,
                 sort_order: editingService.sort_order
@@ -354,23 +370,40 @@ const ServicesManager = () => {
         setServices(services.map(s => s.id === service.id ? updatedService : s));
 
         try {
+            const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
+            // The list response carries no child records, and an upsert replaces
+            // them wholesale — so the full service is loaded first, otherwise
+            // toggling visibility would wipe its features, benefits, FAQs and stats.
+            const detailRes = await authenticatedFetch(`${apiBase}/services/${service.slug}`);
+            if (!detailRes.ok) {
+                toast.error("Failed to update visibility");
+                fetchData();
+                return;
+            }
+            const full = await detailRes.json();
+
             const payload = {
-                id: service.id,
-                title: service.title,
-                categoryId: service.category,
+                id: full.id,
+                slug: full.slug || undefined,
+                title: full.title,
+                categoryId: full.category,
                 isActive: !service.is_visible,
-                shortOverview: service.short_overview,
-                longOverview: service.long_overview,
-                state: service.state,
-                doodleType: service.doodle_type,
-                sort_order: service.sort_order,
-                commonProblems: service.problems || [],
-                whyTruscomp: service.whyTrusComp || [],
-                features: service.features || [],
-                benefits: service.benefits || []
+                shortOverview: full.short_overview,
+                longOverview: full.long_overview,
+                state: full.state,
+                doodleType: full.doodle_type,
+                sort_order: full.sort_order,
+                commonProblems: full.problems || [],
+                whyTruscomp: full.whyTrusComp || [],
+                features: full.features || [],
+                benefits: full.benefits || [],
+                faqs: full.faqs || [],
+                stats: full.stats || [],
+                quote: full.quote || "",
+                quoteAuthor: full.quote_author || ""
             };
 
-            const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
             const response = await authenticatedFetch(`${apiBase}/services/upsert`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -661,6 +694,31 @@ const ServicesManager = () => {
                                     </div>
 
                                     <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Page URL</label>
+                                        <div className="flex items-center h-11 rounded-xl border border-slate-200 bg-white focus-within:ring-4 focus-within:ring-primary/5 transition-all overflow-hidden">
+                                            <span className="pl-3 pr-1 text-xs font-bold text-slate-400 select-none shrink-0">/services/</span>
+                                            <Input
+                                                value={editingService.slug}
+                                                onChange={e => setEditingService({
+                                                    ...editingService,
+                                                    // Keep it URL-safe as it is typed.
+                                                    slug: e.target.value
+                                                        .toLowerCase()
+                                                        .replace(/[^\w\s-]/g, '')
+                                                        .replace(/[\s_]+/g, '-')
+                                                        .replace(/-+/g, '-')
+                                                })}
+                                                placeholder="auto-generated from the title"
+                                                className="h-full border-0 pl-0 font-bold rounded-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                                            />
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                                            Leave blank to generate it from the title. Changing this changes the
+                                            page address, and any existing links to the old address will break.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Classification Category</label>
                                             <Button
@@ -866,7 +924,82 @@ const ServicesManager = () => {
                                 </div>
                             </div>
 
-                            {/* Section 4: FAQs */}
+                            {/* Section 4: Highlight Stats & Quote (used by feature pages such as GCC) */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6 border-t border-slate-100">
+                                {/* Stats */}
+                                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <BarChart3 className="w-4 h-4 text-indigo-500" />
+                                        Highlight Stats
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Figures</label>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setEditingService({ ...editingService, stats: [...(editingService.stats || []), { label: "", value: "" }] })}
+                                                className="h-7 px-3 text-[11px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all duration-300 shadow-sm"
+                                            >
+                                                + Add Stat
+                                            </Button>
+                                        </div>
+                                        <div className="space-y-4">
+                                            {(editingService.stats || []).map((st, idx) => (
+                                                <div key={idx} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4 group/item hover:border-indigo-200/50 transition-all">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover/item:text-indigo-500/40 transition-colors">Stat #{idx + 1}</span>
+                                                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={() => setEditingService({ ...editingService, stats: editingService.stats.filter((_, i) => i !== idx) })}><X className="w-4 h-4" /></Button>
+                                                    </div>
+                                                    <Input className="h-10 text-xs font-bold border-slate-200 rounded-lg focus:ring-4 focus:ring-indigo-500/5 transition-all" placeholder="Value, e.g. 1,800+" value={st.value} onChange={e => {
+                                                        const newStats = [...editingService.stats];
+                                                        newStats[idx] = { ...st, value: e.target.value };
+                                                        setEditingService({ ...editingService, stats: newStats });
+                                                    }} />
+                                                    <Input className="h-10 text-xs border-slate-200 rounded-lg focus:ring-4 focus:ring-indigo-500/5 transition-all" placeholder="Label, e.g. GCCs in India" value={st.label} onChange={e => {
+                                                        const newStats = [...editingService.stats];
+                                                        newStats[idx] = { ...st, label: e.target.value };
+                                                        setEditingService({ ...editingService, stats: newStats });
+                                                    }} />
+                                                </div>
+                                            ))}
+                                            {(!editingService.stats || editingService.stats.length === 0) && (
+                                                <p className="text-xs text-slate-400 font-medium">No stats added yet</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Quote */}
+                                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <QuoteIcon className="w-4 h-4 text-amber-500" />
+                                        Pull Quote
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Quote Text</label>
+                                            <Textarea
+                                                className="text-xs border-slate-200 rounded-lg focus:ring-4 focus:ring-amber-500/5 transition-all min-h-[120px]"
+                                                placeholder="Enter the quote, without quotation marks..."
+                                                value={editingService.quote || ""}
+                                                onChange={e => setEditingService({ ...editingService, quote: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Attribution</label>
+                                            <Input
+                                                className="h-10 text-xs border-slate-200 rounded-lg focus:ring-4 focus:ring-amber-500/5 transition-all"
+                                                placeholder="e.g. Mr. Anand Gopalan, Knowledge Partner, TrusComp"
+                                                value={editingService.quote_author || ""}
+                                                onChange={e => setEditingService({ ...editingService, quote_author: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Section 5: FAQs */}
                             <div className="grid grid-cols-1 gap-8 pt-6 border-t border-slate-100">
                                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                                     <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">

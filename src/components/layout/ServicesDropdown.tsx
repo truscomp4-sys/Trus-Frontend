@@ -119,6 +119,9 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                                     </Link>
                                 </div>
                             ))}
+                            {/* GCC now comes from the services API like every other
+                                entry, so the manual link is retired. Kept for
+                                reference in case the CMS record is ever removed.
                             <div className="break-inside-avoid md:mb-1">
                                 <Link
                                     href="/services/gcc"
@@ -128,6 +131,7 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                                     GCC
                                 </Link>
                             </div>
+                            */}
                             <div className="break-inside-avoid mt-2 md:mt-0 md:pt-2">
                                 <Link
                                     href="/services"
@@ -147,8 +151,10 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
     // Helper to divide services into roughly equal columns for Desktop Grid
     const desktopColumns = [];
     const desktopItems = [...services];
-    // Add GCC and Explore All to the list of items to render in the grid
-    desktopItems.push({ id: 'gcc-item', title: 'Global Capability Center (GCC)', slug: 'gcc' });
+    // Add Explore All to the list of items to render in the grid.
+    // GCC now comes from the services API like every other entry, so the manual
+    // push is retired. Kept for reference in case the CMS record is ever removed.
+    // desktopItems.push({ id: 'gcc-item', title: 'Global Capability Center (GCC)', slug: 'gcc' });
     desktopItems.push({ id: 'explore-all', title: 'Explore All Services →', slug: '', isAction: true });
 
     const itemsPerColumn = Math.ceil(desktopItems.length / 4);
