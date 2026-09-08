@@ -215,7 +215,7 @@ const BlogDetail = ({ id }: { id: string }) => {
 
                         {/* Main Content */}
                         <main className="lg:col-span-8 space-y-12">
-                            <article className="break-words text-justify">
+                            <article className="break-words">
                             {/* Introduction */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}

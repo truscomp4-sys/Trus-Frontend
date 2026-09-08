@@ -146,7 +146,7 @@ const OverviewSection = ({ service }: any) => {
                 <ShieldCheck className="w-6 h-6 text-primary" /> Service Overview
             </h2>
             <div
-                className="prose prose-slate max-w-none text-foreground/80 leading-relaxed p-6 bg-card rounded-xl border border-border shadow-sm break-words overflow-hidden text-justify"
+                className="prose prose-slate max-w-none text-foreground/80 leading-relaxed p-6 bg-card rounded-xl border border-border shadow-sm break-words overflow-hidden"
                 dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
             />
         </div>
