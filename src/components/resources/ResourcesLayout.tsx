@@ -22,6 +22,9 @@ const ResourcesLayout = () => {
 
                 // Fetch labour law updates
                 const labourLawResponse = await fetch(`${apiBase}/labour-law-updates?limit=1000`);
+
+                // Fetch statutory holidays (Admin > Holidays)
+                const holidaysResponse = await fetch(`${apiBase}/holidays`);
                 let allResources: ResourceItem[] = [];
 
                 // Map regular resources
@@ -80,6 +83,29 @@ const ResourcesLayout = () => {
                         } : undefined
                     }));
                     allResources = [...allResources, ...mappedLabourData];
+                }
+
+                // Map holidays into the same shape; the Holidays List view groups
+                // them by state and derives the weekday from the date itself.
+                if (holidaysResponse.ok) {
+                    const responseData = await holidaysResponse.json();
+                    const items = Array.isArray(responseData.data)
+                        ? responseData.data
+                        : Array.isArray(responseData)
+                            ? responseData
+                            : [];
+
+                    const mappedHolidays: ResourceItem[] = items.map((item: any) => ({
+                        id: `holiday-${item.id}`,
+                        title: item.holiday_name,
+                        description: item.holiday_type || "",
+                        releaseDate: item.holiday_date,
+                        effectiveDate: item.holiday_date,
+                        state: item.state_code || "Central",
+                        category: "Holidays List" as ResourceCategory,
+                        downloadUrl: "#"
+                    }));
+                    allResources = [...allResources, ...mappedHolidays];
                 }
 
                 setResources(allResources);

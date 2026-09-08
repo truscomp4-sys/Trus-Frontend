@@ -10,18 +10,26 @@ import CTASection from "@/components/home/CTASection";
 import NotificationTicker from "@/components/home/NotificationTicker";
 
 import { useSEO } from "@/hooks/useSEO";
+import { useSettingValue } from "@/hooks/useSettingValue";
+import { HOME_CONTENT_KEY, DEFAULT_HOME_CONTENT } from "@/lib/homeContent";
 
 const Index = () => {
   useSEO("home");
+
+  // One request for the whole page; each section gets its own slice so the
+  // components stay presentational. The ticker and the FAQ block fetch their
+  // own data and are left alone.
+  const content = useSettingValue(HOME_CONTENT_KEY, DEFAULT_HOME_CONTENT);
+
   return (
     <Layout>
-      <HeroSection />
+      <HeroSection content={content.hero} />
       <NotificationTicker />
-      <LivingComplianceSystem />
-      <WhyChooseUs />
-      <ClientLogos />
+      <LivingComplianceSystem content={content.services} />
+      <WhyChooseUs content={content.why_choose} />
+      <ClientLogos content={content.clients} />
       <FAQSection />
-      <CTASection />
+      <CTASection content={content.cta} />
     </Layout>
   );
 };

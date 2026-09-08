@@ -2,18 +2,15 @@
 
 import { motion } from "framer-motion";
 import { useMemo } from "react";
+import { useHasMounted } from "@/hooks/useHasMounted";
+import type { FrameworkContent } from "@/lib/aboutContent";
 
-const phases = [
-    { step: "01", title: "Needs Analysis", range: "Phase 1-2" },
-    { step: "02", title: "Project Planning", range: "Phase 3" },
-    { step: "03", title: "Technical Setup", range: "Phase 4" },
-    { step: "04", title: "User Onboarding", range: "Phase 4-5" },
-    { step: "05", title: "Pilot Testing", range: "Phase 6-7" },
-    { step: "06", title: "Full-Scale Deployment", range: "Phase 8-9" },
-    { step: "07", title: "Ongoing Support", range: "Ongoing" },
-];
+const DeliveryFramework = ({ content }: { content: FrameworkContent }) => {
+    const phases = content.phases;
+    const hasMounted = useHasMounted();
 
-const DeliveryFramework = () => {
+    // Randomised decoration, rendered on the client only: on the server these
+    // positions would not match the markup React hydrates.
     const particles = useMemo(() => {
         return Array.from({ length: 15 }).map((_, i) => ({
             id: i,
@@ -33,7 +30,7 @@ const DeliveryFramework = () => {
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
                 {/* Data Flow Lines (Particles) */}
-                {particles.map((p) => (
+                {hasMounted && particles.map((p) => (
                     <motion.div
                         key={p.id}
                         className="absolute h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent"
@@ -71,10 +68,10 @@ const DeliveryFramework = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                     >
-                        <span className="text-primary font-display font-medium tracking-[0.3em] uppercase text-sm">Our Methodology</span>
-                        <h2 className="text-4xl md:text-5xl font-display font-bold mt-4 tracking-tight">Compliance, Engineered in Phases</h2>
+                        <span className="text-primary font-display font-medium tracking-[0.3em] uppercase text-sm">{content.eyebrow}</span>
+                        <h2 className="text-4xl md:text-5xl font-display font-bold mt-4 tracking-tight">{content.heading}</h2>
                         <p className="text-white/40 mt-6 max-w-2xl mx-auto text-lg font-light leading-relaxed">
-                            A meticulously structured framework designed for seamless operational transition and long-term stability.
+                            {content.description}
                         </p>
                     </motion.div>
                 </div>
@@ -92,7 +89,10 @@ const DeliveryFramework = () => {
                         />
                     </div>
 
-                    <div className="grid grid-cols-7 gap-6 relative z-10 text-center">
+                    <div
+                        className="grid gap-6 relative z-10 text-center"
+                        style={{ gridTemplateColumns: `repeat(${Math.max(phases.length, 1)}, minmax(0, 1fr))` }}
+                    >
                         {phases.map((phase, index) => (
                             <TimelineNode key={index} phase={phase} index={index} />
                         ))}

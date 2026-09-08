@@ -5,16 +5,21 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from "framer-motion";
 import {
+    ClipboardCheck,
     LayoutDashboard,
+    LayoutTemplate,
+    Mail,
     MessageSquare,
     Briefcase,
     FileText,
     Zap,
     Star,
+    Calculator,
     Calendar,
     Settings,
     Globe,
     BookOpen,
+    Users,
     ChevronLeft,
     ChevronRight,
     LogOut,
@@ -84,6 +89,20 @@ const NavItem = ({ icon: Icon, label, path, active, collapsed }: NavItemProps) =
     return content;
 };
 
+const NavGroupLabel = ({ title, collapsed }: { title: string; collapsed: boolean }) => {
+    // Collapsed to the icon rail there is no room for words, so the group reads
+    // as a rule between the icons instead.
+    if (collapsed) {
+        return <div className="my-3 mx-2 border-t border-slate-100" />;
+    }
+
+    return (
+        <p className="px-3 pt-5 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 first:pt-0">
+            {title}
+        </p>
+    );
+};
+
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -91,17 +110,43 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const { data: settings } = useSettings();
 
-    const navItems = [
-        { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-        { label: "Enquiries & Leads", icon: MessageSquare, path: "/admin/enquiries" },
-        { label: "Services", icon: Briefcase, path: "/admin/services" },
-        { label: "Resource Center", icon: FileText, path: "/admin/resources" },
-        { label: "Labour Law Updates", icon: BookOpen, path: "/admin/labour-law-updates" },
-        { label: "Blog Management", icon: FileText, path: "/admin/blogs" },
-        { label: "Testimonials", icon: Star, path: "/admin/testimonials" },
-        { label: "FAQ Manager", icon: HelpCircle, path: "/admin/faq" },
-        { label: "SEO Manager", icon: Globe, path: "/admin/seo" },
-        { label: "System Settings", icon: Settings, path: "/admin/settings" },
+    const navGroups = [
+        {
+            title: "Overview",
+            items: [
+                { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+                { label: "Enquiries & Leads", icon: MessageSquare, path: "/admin/enquiries" },
+            ],
+        },
+        {
+            title: "Page Content",
+            items: [
+                { label: "Home Page", icon: LayoutTemplate, path: "/admin/home-content" },
+                { label: "About Page", icon: Users, path: "/admin/about-content" },
+                { label: "Calculator Page", icon: Calculator, path: "/admin/calculator-content" },
+                { label: "Contact Page", icon: Mail, path: "/admin/contact-content" },
+            ],
+        },
+        {
+            title: "Content",
+            items: [
+                { label: "Services", icon: Briefcase, path: "/admin/services" },
+                { label: "Blog Management", icon: FileText, path: "/admin/blogs" },
+                { label: "Resource Center", icon: FileText, path: "/admin/resources" },
+                { label: "Labour Law Updates", icon: BookOpen, path: "/admin/labour-law-updates" },
+                { label: "Compliance Updates", icon: ClipboardCheck, path: "/admin/compliance" },
+                { label: "Holidays", icon: Calendar, path: "/admin/holidays" },
+                { label: "Testimonials", icon: Star, path: "/admin/testimonials" },
+                { label: "FAQ Manager", icon: HelpCircle, path: "/admin/faq" },
+            ],
+        },
+        {
+            title: "Configuration",
+            items: [
+                { label: "SEO Manager", icon: Globe, path: "/admin/seo" },
+                { label: "System Settings", icon: Settings, path: "/admin/settings" },
+            ],
+        },
     ];
 
     const currentPath = pathname;
@@ -148,13 +193,20 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
                     {/* Sidebar Navigation */}
                     <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1 custom-scrollbar">
-                        {navItems.map((item) => (
-                            <NavItem
-                                key={item.path}
-                                {...item}
-                                active={currentPath === item.path}
-                                collapsed={collapsed}
-                            />
+                        {navGroups.map((group) => (
+                            <div key={group.title}>
+                                <NavGroupLabel title={group.title} collapsed={collapsed} />
+                                <div className="space-y-1">
+                                    {group.items.map((item) => (
+                                        <NavItem
+                                            key={item.path}
+                                            {...item}
+                                            active={currentPath === item.path}
+                                            collapsed={collapsed}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         ))}
                     </div>
 
@@ -212,13 +264,20 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                                     <X className="w-6 h-6 text-slate-400 cursor-pointer" onClick={() => setMobileMenuOpen(false)} />
                                 </div>
                                 <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-                                    {navItems.map((item) => (
-                                        <NavItem
-                                            key={item.path}
-                                            {...item}
-                                            active={currentPath === item.path}
-                                            collapsed={false}
-                                        />
+                                    {navGroups.map((group) => (
+                                        <div key={group.title}>
+                                            <NavGroupLabel title={group.title} collapsed={false} />
+                                            <div className="space-y-1">
+                                                {group.items.map((item) => (
+                                                    <NavItem
+                                                        key={item.path}
+                                                        {...item}
+                                                        active={currentPath === item.path}
+                                                        collapsed={false}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                                 <div className="p-4 border-t border-slate-100">

@@ -2,8 +2,10 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import type { VisionMissionContent } from "@/lib/aboutContent";
 
-const VisionMission = () => {
+const VisionMission = ({ content }: { content: VisionMissionContent }) => {
+    const { vision, mission } = content;
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -37,11 +39,11 @@ const VisionMission = () => {
                         className="max-w-4xl mx-auto text-center"
                     >
                         <span className="text-primary font-display font-medium tracking-[0.3em] uppercase mb-8 block text-sm">
-                            Our Vision
+                            {vision.eyebrow}
                         </span>
                         <div className="relative">
                             <h3 className="text-5xl md:text-7xl font-display font-bold leading-tight tracking-tighter">
-                                To be the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-warning">leading force</span> transforming compliance.
+                                {vision.heading_prefix} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-warning">{vision.heading_highlight}</span> {vision.heading_suffix}
                             </h3>
                             <motion.div
                                 className="absolute inset-0 blur-3xl bg-primary/5 -z-10"
@@ -50,7 +52,7 @@ const VisionMission = () => {
                             />
                         </div>
                         <p className="mt-8 text-xl text-muted-foreground/80 leading-relaxed font-light">
-                            To be the leading force in transforming compliance management in India, enabling organizations to achieve regulatory excellence effortlessly. We aim to set new benchmarks for ethical business practices across industries, fostering trust, transparency, and innovation.
+                            {vision.body}
                         </p>
                     </motion.div>
 
@@ -60,13 +62,13 @@ const VisionMission = () => {
                         className="max-w-4xl mx-auto text-center"
                     >
                         <span className="text-accent font-display font-medium tracking-[0.3em] uppercase mb-8 block text-sm">
-                            Our Mission
+                            {mission.eyebrow}
                         </span>
                         <h3 className="text-5xl md:text-7xl font-display font-bold leading-tight tracking-tighter">
-                            Empowering businesses with <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">innovative</span> solutions.
+                            {mission.heading_prefix} <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">{mission.heading_highlight}</span> {mission.heading_suffix}
                         </h3>
                         <p className="mt-8 text-xl text-muted-foreground/80 leading-relaxed font-light">
-                            To empower businesses with innovative compliance solutions that simplify regulatory adherence and enhance operational efficiency. We strive to enable organizations to focus on growth with complete trust in their compliance.
+                            {mission.body}
                         </p>
                     </motion.div>
                 </div>

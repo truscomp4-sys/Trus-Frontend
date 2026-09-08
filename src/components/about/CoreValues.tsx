@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo } from "react";
+import { useHasMounted } from "@/hooks/useHasMounted";
 import {
     Heart,
     Eye,
@@ -9,51 +10,27 @@ import {
     Lightbulb,
     Users,
     Handshake,
-    GraduationCap
+    GraduationCap,
+    Shield,
+    Award,
+    Target,
+    Zap,
+    BookOpen
 } from "lucide-react";
+import type { CoreValuesContent, ValueIconName } from "@/lib/aboutContent";
 
-const values = [
-    {
-        icon: Heart,
-        label: "Trust",
-        description: "Building long-lasting relationships."
-    },
-    {
-        icon: Eye,
-        label: "Transparency",
-        description: "Open and honest communication."
-    },
-    {
-        icon: Scale,
-        label: "Ethical Practices",
-        description: "Upholding highest standards."
-    },
-    {
-        icon: Lightbulb,
-        label: "Innovation",
-        description: "Future-ready solutions."
-    },
-    {
-        icon: Users,
-        label: "Client-Centric",
-        description: "Exceeding expectations."
-    },
-    {
-        icon: Handshake,
-        label: "Collaboration",
-        description: "Teamwork for problem-solving."
-    },
-    {
-        icon: GraduationCap,
-        label: "Learning",
-        description: "Continuous improvement."
-    }
-];
+// Icons arrive from the admin as names; anything unrecognised falls back to Heart.
+const ICONS: Record<ValueIconName, typeof Heart> = {
+    Heart, Eye, Scale, Lightbulb, Users, Handshake, GraduationCap,
+    Shield, Award, Target, Zap, BookOpen
+};
 
-const CoreValues = () => {
+const CoreValues = ({ content }: { content: CoreValuesContent }) => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const hasMounted = useHasMounted();
 
-    // Generate random particles for the background
+    // Randomised decoration, rendered on the client only: on the server these
+    // positions would not match the markup React hydrates.
     const particles = useMemo(() => {
         return Array.from({ length: 20 }).map((_, i) => ({
             id: i,
@@ -77,7 +54,7 @@ const CoreValues = () => {
                 <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
                 {/* Drifting Particles */}
-                {particles.map((p) => (
+                {hasMounted && particles.map((p) => (
                     <motion.div
                         key={p.id}
                         className="absolute bg-primary/20 rounded-full"
@@ -111,13 +88,13 @@ const CoreValues = () => {
                         viewport={{ once: true }}
                         className="space-y-4"
                     >
-                        <span className="text-primary font-display font-medium tracking-[0.3em] uppercase text-sm">Our DNA</span>
-                        <h2 className="text-4xl md:text-5xl font-display font-bold">Values in Motion</h2>
+                        <span className="text-primary font-display font-medium tracking-[0.3em] uppercase text-sm">{content.eyebrow}</span>
+                        <h2 className="text-4xl md:text-5xl font-display font-bold">{content.heading}</h2>
                     </motion.div>
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-8 md:gap-12 transition-all duration-500">
-                    {values.map((item, index) => (
+                    {content.values.map((item, index) => (
                         <ValueNode
                             key={index}
                             item={item}
@@ -146,7 +123,10 @@ const ValueNode = ({ item, index, isHovered, isAnyHovered, onHover, onLeave }: a
             onMouseLeave={onLeave}
         >
             <div className={`flex items-center gap-4 px-8 py-4 rounded-full border transition-all duration-500 cursor-default ${isHovered ? 'border-primary bg-primary/10 shadow-[0_0_20px_rgba(255,107,0,0.2)]' : 'border-white/10 bg-white/5'}`}>
-                <item.icon className={`w-5 h-5 transition-all duration-500 ${isHovered ? 'text-primary scale-110' : 'text-white/40'}`} strokeWidth={1.5} />
+                {(() => {
+                    const Icon = ICONS[item.icon as ValueIconName] || Heart;
+                    return <Icon className={`w-5 h-5 transition-all duration-500 ${isHovered ? 'text-primary scale-110' : 'text-white/40'}`} strokeWidth={1.5} />;
+                })()}
                 <span className={`font-display font-semibold transition-all duration-500 ${isHovered ? 'text-white' : 'text-white/70'}`}>
                     {item.label}
                 </span>

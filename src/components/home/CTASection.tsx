@@ -4,8 +4,15 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, Sparkles } from "lucide-react";
 import AnimatedSection from "@/components/ui/animated-section";
+import { DEFAULT_HOME_CONTENT, type HomeCtaContent } from "@/lib/homeContent";
 
-const CTASection = () => {
+// Dots cycle through the accent colours so the row holds up whatever number of
+// indicators is saved.
+const INDICATOR_DOT_COLORS = ["bg-success", "bg-primary", "bg-accent"];
+
+// The wage calculator page reuses this block without the homepage fetch, so
+// the prop is optional and falls back to the shipped copy.
+const CTASection = ({ content = DEFAULT_HOME_CONTENT.cta }: { content?: HomeCtaContent }) => {
   return (
     <section className="relative py-20 lg:py-28 overflow-hidden">
       {/* Gradient background */}
@@ -28,23 +35,22 @@ const CTASection = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/10 backdrop-blur-sm border border-background/20 text-background text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
-            Start Your Journey
+            {content.badge}
           </div>
 
           <h2 className="text-3xl lg:text-5xl xl:text-6xl font-display font-bold text-background mb-6">
-            Ready to Simplify Your{" "}
-            <span className="text-primary">Compliance?</span>
+            {content.heading_prefix}{" "}
+            <span className="text-primary">{content.heading_highlight}</span>
           </h2>
           <p className="text-lg lg:text-xl text-background/70 max-w-2xl mx-auto mb-10">
-            Schedule a free consultation with our compliance experts and discover 
-            how we can help protect your business from regulatory risks.
+            {content.description}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="btn-primary text-base group">
               <Link href="/contact">
                 <Calendar className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                Book Free Consultation
+                {content.primary_label}
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
@@ -55,7 +61,7 @@ const CTASection = () => {
               className="bg-transparent border-background/30 text-background hover:bg-background/10 hover:border-background/50 text-base group backdrop-blur-sm"
             >
               <Link href="/services">
-                Explore Services
+                {content.secondary_label}
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
@@ -63,18 +69,12 @@ const CTASection = () => {
 
           {/* Trust indicators */}
           <div className="mt-12 flex flex-wrap justify-center gap-8 text-background/60 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-success" />
-              No Hidden Fees
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-primary" />
-              Free Initial Assessment
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-accent" />
-              Expert Consultation
-            </div>
+            {content.trust_indicators.map((indicator, i) => (
+              <div key={indicator} className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${INDICATOR_DOT_COLORS[i % INDICATOR_DOT_COLORS.length]}`} />
+                {indicator}
+              </div>
+            ))}
           </div>
         </AnimatedSection>
       </div>

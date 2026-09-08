@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion";
 import { Repeat } from "lucide-react";
+import type { SupportContent } from "@/lib/aboutContent";
 
-const ContinuousSupport = () => {
+const ContinuousSupport = ({ content }: { content: SupportContent }) => {
     return (
         <section className="py-24 bg-card overflow-hidden">
             <div className="section-container text-center">
@@ -14,12 +15,12 @@ const ContinuousSupport = () => {
                     className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-accent/10 text-accent mb-8"
                 >
                     <Repeat className="w-4 h-4 animate-spin-slow" />
-                    <span className="font-medium">Beyond Go-Live</span>
+                    <span className="font-medium">{content.badge}</span>
                 </motion.div>
 
                 <h2 className="text-3xl md:text-5xl font-display font-bold mb-8 max-w-2xl mx-auto">
-                    Compliance doesn't end at implementation. <br />
-                    <span className="text-muted-foreground">We stay with you.</span>
+                    {content.heading_line1} <br />
+                    <span className="text-muted-foreground">{content.heading_line2}</span>
                 </h2>
 
                 {/* Infinite Loop Animation Visual */}

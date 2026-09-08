@@ -11,19 +11,26 @@ import ContinuousSupport from "@/components/about/ContinuousSupport";
 import AboutCTA from "@/components/about/AboutCTA";
 
 import { useSEO } from "@/hooks/useSEO";
+import { useSettingValue } from "@/hooks/useSettingValue";
+import { ABOUT_CONTENT_KEY, DEFAULT_ABOUT_CONTENT } from "@/lib/aboutContent";
 
 const About = () => {
   useSEO("about");
+
+  // One request for the whole page; each section gets its own slice so the
+  // components stay presentational.
+  const content = useSettingValue(ABOUT_CONTENT_KEY, DEFAULT_ABOUT_CONTENT);
+
   return (
     <Layout>
-      <AboutHero />
-      <CoreValues />
-      <FoundersLeadership />
-      <ImpactScale />
-      <VisionMission />
-      <DeliveryFramework />
-      <ContinuousSupport />
-      <AboutCTA />
+      <AboutHero content={content.hero} />
+      <CoreValues content={content.core_values} />
+      <FoundersLeadership content={content.leadership} />
+      <ImpactScale content={content.impact} />
+      <VisionMission content={content.vision_mission} />
+      <DeliveryFramework content={content.framework} />
+      <ContinuousSupport content={content.support} />
+      <AboutCTA content={content.cta} />
     </Layout>
   );
 };

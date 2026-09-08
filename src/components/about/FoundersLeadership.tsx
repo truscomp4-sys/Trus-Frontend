@@ -2,43 +2,15 @@
 
 import { motion } from "framer-motion";
 import { User, Award, BookOpen } from "lucide-react";
+import type { LeadershipContent } from "@/lib/aboutContent";
 
-const founders = [
-    {
-        name: "Mr. S. Deenadayalan",
-        role: "Founder",
-        image: "/images/leadership/deenadayalan.png",
-        expertise: ["50+ Years Experience", "Centre for Excellence CEO", "Pioneered Self-Managed Teams"],
-        description: "A visionary leader who has shaped the landscape of organizational excellence in India."
-    },
-    {
-        name: "Mr. PPK Mahindhra",
-        role: "Co-Founder",
-        image: "/images/leadership/ppk-mahindhra1.png",
-        expertise: ["26+ Years Experience", "Automation Pioneer", "RPA-Powered Tools"],
-        description: "Driving the digital transformation of compliance through high-performance systems."
-    },
-    {
-        name: "Mr. Anand Gopalan",
-        role: "Knowledge Partner",
-        image: "/images/leadership/anand-gopalan.png",
-        expertise: ["Barrister", "Industrial Relations", "Policy Reform Contributor"],
-        description: "Providing the legal backbone and deep insights into labor law complexities."
-    }
-];
-
-const leadership = [
-    { name: "Mr. Ramesh", role: "Head of Operations" },
-    { name: "Mr. C. Sreetharan", role: "Chief Operating Officer" },
-    { name: "Mr. M.V. Prakash", role: "Senior Vice President" }
-];
-
-const FoundersLeadership = () => {
+const FoundersLeadership = ({ content }: { content: LeadershipContent }) => {
+    const { founders, leadership } = content;
     return (
         <section className="py-20 md:py-24 bg-background relative">
             <div className="section-container max-w-5xl">
                 <div className="text-center mb-24">
-                    <h2 className="text-4xl md:text-5xl font-display font-bold">Leadership That Built the System</h2>
+                    <h2 className="text-4xl md:text-5xl font-display font-bold">{content.heading}</h2>
                 </div>
 
                 {/* Founders Vertical Flow */}
@@ -87,7 +59,7 @@ const FoundersLeadership = () => {
 
                 {/* Leadership Team Collective */}
                 <div className="mt-32 pt-20 border-t border-border/50">
-                    <h3 className="text-2xl font-bold text-center mb-12">Operational Leadership</h3>
+                    <h3 className="text-2xl font-bold text-center mb-12">{content.leadership_heading}</h3>
                     <div className="grid md:grid-cols-3 gap-8 text-center">
                         {leadership.map((leader, index) => (
                             <motion.div

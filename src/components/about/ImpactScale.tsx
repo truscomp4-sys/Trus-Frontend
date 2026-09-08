@@ -1,29 +1,9 @@
 'use client'
 
 import { motion } from "framer-motion";
+import type { ImpactContent } from "@/lib/aboutContent";
 
-const metrics = [
-    {
-        id: "01",
-        number: "7+",
-        label: "7+ Years of Excellence",
-        description: "Delivering customized compliance solutions."
-    },
-    {
-        id: "02",
-        number: "60+",
-        label: "60+ Compliance Specialists",
-        description: "Dedicated experts ensuring your peace of mind."
-    },
-    {
-        id: "03",
-        number: "100+",
-        label: "100+ Trusted Clients",
-        description: "Including industry leaders across sectors."
-    }
-];
-
-const ImpactScale = () => {
+const ImpactScale = ({ content }: { content: ImpactContent }) => {
     return (
         <section className="py-32 bg-[#1a1c20] text-white relative overflow-hidden">
             {/* Dark Animated Background - Lightened */}
@@ -39,13 +19,13 @@ const ImpactScale = () => {
                     viewport={{ once: true }}
                     className="text-center mb-24"
                 >
-                    <span className="text-primary font-medium tracking-[0.2em] uppercase text-sm">Impact & Resonance</span>
-                    <h2 className="text-4xl md:text-5xl font-display font-bold mt-4">Proof Through Presence</h2>
+                    <span className="text-primary font-medium tracking-[0.2em] uppercase text-sm">{content.eyebrow}</span>
+                    <h2 className="text-4xl md:text-5xl font-display font-bold mt-4">{content.heading}</h2>
                 </motion.div>
 
                 <div className="grid md:grid-cols-3 gap-16 md:gap-8">
-                    {metrics.map((item, index) => (
-                        <div key={item.id} className="relative group text-center md:text-left">
+                    {content.metrics.map((item, index) => (
+                        <div key={`${item.label}-${index}`} className="relative group text-center md:text-left">
                             {/* Large Background Number */}
                             <motion.span
                                 initial={{ opacity: 0, scale: 0.8 }}

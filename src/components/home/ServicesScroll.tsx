@@ -153,9 +153,7 @@ const ServicesScroll = () => {
 
                     {/* LEFT: Visual Area */}
                     <div className="w-1/2 h-full relative flex items-center justify-center p-20 bg-background/50">
-                        <LivingComplianceSystem
-                            activeServiceId={services[activeindex].id}
-                        />
+                        <LivingComplianceSystem />
                     </div>
 
                     {/* RIGHT: Content Area */}
@@ -245,10 +243,7 @@ const ServicesMobile = () => {
 
                         {/* Inline Doodle Visual */}
                         <div className="w-full h-32 mb-4 bg-muted/20 rounded-xl flex items-center justify-center overflow-hidden">
-                            <LivingComplianceSystem
-                                isMobile={true}
-                                singleServiceId={service.id}
-                            />
+                            <LivingComplianceSystem />
                         </div>
 
                         <div className="flex items-start gap-4">

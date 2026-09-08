@@ -2,29 +2,10 @@
 
 import { Building2, Sparkles } from "lucide-react";
 import AnimatedSection from "@/components/ui/animated-section";
+import type { ClientsContent } from "@/lib/homeContent";
 
-// Import logos
-import eucareLogo from "@/assets/eucare-1.png";
-import yuluLogo from "@/assets/yulu-2.png";
-import yumaLogo from "@/assets/yuma-3.png";
-import apolloLogo from "@/assets/apollo-4.png";
-import kothariLogo from "@/assets/kotharai-5.png";
-import sanofiLogo from "@/assets/sanofi-6.png";
-import fischerLogo from "@/assets/fischer-7.png";
-import sankarLogo from "@/assets/sanker-8.png";
-
-const clients = [
-  { name: "EUCARE", logo: eucareLogo.src },
-  { name: "YULU", logo: yuluLogo.src },
-  { name: "YUMA", logo: yumaLogo.src },
-  { name: "Apollo Hospitals", logo: apolloLogo.src },
-  { name: "KICL", logo: kothariLogo.src },
-  { name: "Sanofi", logo: sanofiLogo.src },
-  { name: "Fischer", logo: fischerLogo.src },
-  { name: "Sankar", logo: sankarLogo.src },
-];
-
-const ClientLogos = () => {
+const ClientLogos = ({ content }: { content: ClientsContent }) => {
+  const clients = content.logos;
   return (
     <section className="relative py-16 lg:py-24 overflow-hidden bg-slate-900">
       {/* --- PREMIUM REFINED BACKGROUND SYSTEM (Login Style) --- */}
@@ -83,15 +64,15 @@ const ClientLogos = () => {
         <AnimatedSection className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
             <Building2 className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-slate-100">Our Partners</span>
+            <span className="text-sm font-medium text-slate-100">{content.badge}</span>
             <Sparkles className="w-4 h-4 text-primary" />
           </div>
           <h2 className="text-3xl lg:text-5xl font-display font-bold text-white mb-6">
-            Trusted by{" "}
-            <span className="text-primary drop-shadow-[0_0_15px_rgba(249,115,22,0.3)]">Leading Organizations</span>
+            {content.heading_prefix}{" "}
+            <span className="text-primary drop-shadow-[0_0_15px_rgba(249,115,22,0.3)]">{content.heading_highlight}</span>
           </h2>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Join 100+ enterprises that rely on our expertise for compliance excellence
+            {content.description}
           </p>
         </AnimatedSection>
 
@@ -144,11 +125,7 @@ const ClientLogos = () => {
         {/* Stats Row (Enhanced for Premium Look) */}
         <AnimatedSection delay={200} className="pt-8 border-t border-white/10">
           <div className="flex flex-wrap justify-center gap-12 lg:gap-24">
-            {[
-              { value: "100+", label: "Enterprise Clients" },
-              { value: "15+", label: "Industries Served" },
-              { value: "98%", label: "Retention Rate" },
-            ].map((stat, index) => (
+            {content.stats.map((stat, index) => (
               <div key={index} className="text-center group">
                 <div className="text-4xl lg:text-5xl font-display font-bold text-primary group-hover:scale-110 transition-transform drop-shadow-[0_0_10px_rgba(249,115,22,0.2)]">
                   {stat.value}
