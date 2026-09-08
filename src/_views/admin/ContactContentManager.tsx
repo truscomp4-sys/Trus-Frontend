@@ -20,7 +20,6 @@ const SECTIONS: ShellSection[] = [
     { id: "info", label: "Contact Info" },
     { id: "form", label: "Enquiry Form" },
     { id: "team", label: "Team Card" },
-    { id: "success", label: "Success Popup" },
 ];
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.truscomp.com/api/v1";
@@ -58,7 +57,6 @@ const ContactContentManager = () => {
                         info: { ...DEFAULT_CONTACT_CONTENT.info, ...stored.info },
                         form: { ...DEFAULT_CONTACT_CONTENT.form, ...stored.form },
                         team: { ...DEFAULT_CONTACT_CONTENT.team, ...stored.team },
-                        success: { ...DEFAULT_CONTACT_CONTENT.success, ...stored.success },
                     }
                     : DEFAULT_CONTACT_CONTENT;
 
@@ -79,16 +77,18 @@ const ContactContentManager = () => {
         // wa.me needs bare digits including the country code, so anything the
         // admin types with spaces, +, or dashes is normalised here.
         if (whatsapp && whatsapp.length < 10) {
-            toast.error("The WhatsApp number needs the country code, e.g. 919080966206.");
+            toast.error("The WhatsApp number needs the country code, e.g. 919743883000.");
             return;
         }
-        if (!content.form.submit_label.trim()) {
-            toast.error("Give the submit button a label.");
+        const zohoUrl = content.form.zoho_url.trim();
+        if (!/^https?:\/\//i.test(zohoUrl)) {
+            toast.error("The form URL must start with http:// or https://");
             return;
         }
 
         const cleaned: ContactContent = {
             ...content,
+            form: { ...content.form, zoho_url: zohoUrl },
             team: { ...content.team, whatsapp_number: whatsapp },
         };
 
@@ -125,14 +125,14 @@ const ContactContentManager = () => {
     const patch = <K extends keyof ContactContent>(section: K, value: Partial<ContactContent[K]>) =>
         setContent((prev) => ({ ...prev, [section]: { ...prev[section], ...value } }));
 
-    const { hero, info, form, team, success } = content;
+    const { hero, info, form, team } = content;
 
     return (
         <ContentManagerShell
             icon={Mail}
             title="Contact Page Content"
             subtitle="Copy on the public contact page."
-            note={"The office address, phone and email in the info card come from System Settings, and the service dropdown comes from Services — neither is edited here."}
+            note={"The office address, phone and email in the info card come from System Settings. The enquiry form is a Zoho Forms embed — change its fields in Zoho."}
             sections={SECTIONS}
             isLoading={isLoading}
             isSaving={isSaving}
@@ -185,30 +185,23 @@ const ContactContentManager = () => {
                     </Section>
 
                     {/* ---------------------------- Form ---------------------------- */}
-                    <Section id="form" title="Enquiry Form" subtitle="Headings and labels around the form.">
-                        <Field label="Form Heading">
-                            <Input value={form.heading} onChange={(e) => patch("form", { heading: e.target.value })} />
-                        </Field>
-
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            <Field label="Message Field Label">
-                                <Input
-                                    value={form.message_label}
-                                    onChange={(e) => patch("form", { message_label: e.target.value })}
-                                />
-                            </Field>
-                            <Field label="Message Field Placeholder">
-                                <Input
-                                    value={form.message_placeholder}
-                                    onChange={(e) => patch("form", { message_placeholder: e.target.value })}
-                                />
-                            </Field>
-                        </div>
-
-                        <Field label="Submit Button Label">
+                    <Section
+                        id="form"
+                        title="Enquiry Form"
+                        subtitle="The form is a Zoho Forms embed — its fields are edited in Zoho, not here."
+                    >
+                        <Field label="Zoho Form URL" hint="The formperma link from Zoho Forms.">
                             <Input
-                                value={form.submit_label}
-                                onChange={(e) => patch("form", { submit_label: e.target.value })}
+                                value={form.zoho_url}
+                                placeholder="https://forms.zohopublic.in/..."
+                                onChange={(e) => patch("form", { zoho_url: e.target.value })}
+                            />
+                        </Field>
+                        <Field label="Embed Height" hint="Tall enough that the form does not scroll inside its frame, e.g. 1150px.">
+                            <Input
+                                value={form.height}
+                                placeholder="1150px"
+                                onChange={(e) => patch("form", { height: e.target.value })}
                             />
                         </Field>
                     </Section>
@@ -228,17 +221,33 @@ const ContactContentManager = () => {
                             </Field>
                         </div>
 
+                        <Field label="Email">
+                            <Input value={team.email} onChange={(e) => patch("team", { email: e.target.value })} />
+                        </Field>
+
                         <div className="grid sm:grid-cols-2 gap-4">
-                            <Field label="Phone — Shown" hint="e.g. 90809 66206">
+                            <Field label="Phone — Shown" hint="e.g. +91 97438 83000">
                                 <Input
                                     value={team.phone_display}
                                     onChange={(e) => patch("team", { phone_display: e.target.value })}
                                 />
                             </Field>
-                            <Field label="Phone — Dialled" hint="What tapping it calls, e.g. +919080966206">
+                            <Field label="Phone — Dialled" hint="What tapping it calls, e.g. +919743883000">
                                 <Input
                                     value={team.phone_link}
                                     onChange={(e) => patch("team", { phone_link: e.target.value })}
+                                />
+                            </Field>
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            <Field label="QR Caption">
+                                <Input value={team.qr_title} onChange={(e) => patch("team", { qr_title: e.target.value })} />
+                            </Field>
+                            <Field label="QR Sub-caption">
+                                <Input
+                                    value={team.qr_subtitle}
+                                    onChange={(e) => patch("team", { qr_subtitle: e.target.value })}
                                 />
                             </Field>
                         </div>
@@ -265,7 +274,7 @@ const ContactContentManager = () => {
                                     onChange={(e) => patch("team", { whatsapp_button_label: e.target.value })}
                                 />
                             </Field>
-                            <Field label="WhatsApp Number" hint="Digits with country code, e.g. 919080966206.">
+                            <Field label="WhatsApp Number" hint="Digits with country code, e.g. 919743883000.">
                                 <Input
                                     value={team.whatsapp_number}
                                     onChange={(e) => patch("team", { whatsapp_number: e.target.value })}
@@ -274,25 +283,6 @@ const ContactContentManager = () => {
                         </div>
                     </Section>
 
-                    {/* --------------------------- Success --------------------------- */}
-                    <Section id="success" title="Success Popup" subtitle="Shown after an enquiry is submitted.">
-                        <Field label="Title">
-                            <Input value={success.title} onChange={(e) => patch("success", { title: e.target.value })} />
-                        </Field>
-                        <Field label="Description">
-                            <Textarea
-                                rows={3}
-                                value={success.description}
-                                onChange={(e) => patch("success", { description: e.target.value })}
-                            />
-                        </Field>
-                        <Field label="Button Label">
-                            <Input
-                                value={success.button_label}
-                                onChange={(e) => patch("success", { button_label: e.target.value })}
-                            />
-                        </Field>
-                    </Section>
         </ContentManagerShell>
     );
 };

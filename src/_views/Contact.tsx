@@ -1,50 +1,31 @@
 'use client'
 
 import Layout from "@/components/layout/Layout";
-import { useState, useEffect, useMemo } from "react";
-import {
-  validateName,
-  validateEmail,
-  validatePhone,
-  validateService,
-  validateMessage
-} from "@/lib/validation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useSettings } from "@/hooks/useSettings";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { Mail, Phone, MapPin, Send, CheckCircle2, X, MessageCircle } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { motion } from "framer-motion";
 import { useSEO } from "@/hooks/useSEO";
 import { useSettingValue } from "@/hooks/useSettingValue";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import { CONTACT_CONTENT_KEY, DEFAULT_CONTACT_CONTENT } from "@/lib/contactContent";
-
-interface Service {
-  id: number;
-  title: string;
-}
+import { useMemo } from "react";
+import qrCode from "@/assets/qr.png";
 
 const Contact = () => {
   useSEO("contact");
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [services, setServices] = useState<Service[]>([]);
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const { data: settings } = useSettings();
+
+  // Page copy from the admin panel; the address/phone/email in the info card
+  // still come from System Settings.
+  const { hero, info, form, team } = useSettingValue(CONTACT_CONTENT_KEY, DEFAULT_CONTACT_CONTENT);
+
   const hasMounted = useHasMounted();
 
-  // Randomised decoration, so it is generated once on the client only: on the
-  // server it would not match the markup React hydrates, and recomputing it on
-  // render would make the dots jump on every keystroke in the form.
+  // Randomised decoration, generated once on the client only: on the server it
+  // would not match the markup React hydrates.
   const particles = useMemo(
     () =>
       Array.from({ length: 15 }, () => ({
@@ -57,141 +38,6 @@ const Contact = () => {
       })),
     []
   );
-
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const { data: settings } = useSettings();
-
-  // Page copy from the admin panel; address/phone/email still come from
-  // System Settings and the service list from Admin > Services.
-  const { hero, info, form, team, success } = useSettingValue(
-    CONTACT_CONTENT_KEY,
-    DEFAULT_CONTACT_CONTENT
-  );
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    service: "",
-    message: ""
-  });
-
-  const [errors, setErrors] = useState({
-    name: null as string | null,
-    email: null as string | null,
-    phone: null as string | null,
-    service: null as string | null,
-    message: null as string | null
-  });
-
-  const validateField = (name: string, value: string) => {
-    switch (name) {
-      case 'name': return validateName(value);
-      case 'email': return validateEmail(value);
-      case 'phone': return validatePhone(value);
-      case 'service': return validateService(value);
-      case 'message': return validateMessage(value);
-      default: return null;
-    }
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    const error = validateField(field, value);
-    setErrors(prev => ({ ...prev, [field]: error }));
-  };
-
-  const isFormValid = () => {
-    const newErrors = {
-      name: validateName(formData.name),
-      email: validateEmail(formData.email),
-      phone: validatePhone(formData.phone),
-      service: validateService(formData.service),
-      message: validateMessage(formData.message)
-    };
-
-    // Check if any error is not null
-    const isValid = !Object.values(newErrors).some(error => error !== null);
-    return isValid;
-  };
-
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
-  const fetchServices = async () => {
-    try {
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-      const response = await fetch(`${apiBase}/services?public_view=true`);
-      if (response.ok) {
-        const data = await response.json();
-        setServices(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch services", err);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // Validate all fields on submit attempt
-    const newErrors = {
-      name: validateName(formData.name),
-      email: validateEmail(formData.email),
-      phone: validatePhone(formData.phone),
-      service: validateService(formData.service),
-      message: validateMessage(formData.message)
-    };
-
-    setErrors(newErrors);
-
-    if (Object.values(newErrors).some(error => error !== null)) {
-      toast({
-        title: "Validation Error",
-        description: "Please check the form for errors.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-      const response = await fetch(`${apiBase}/enquiries/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          service_interest: formData.service,
-          message: formData.message
-        }),
-      });
-
-      if (response.ok) {
-        setIsSubmitted(true);
-        setFormData({ name: "", email: "", phone: "", service: "", message: "" });
-      } else {
-        const error = await response.json();
-        toast({
-          title: "Submission Failed",
-          description: error.message || "Failed to submit request. Please try again.",
-          variant: "destructive"
-        });
-      }
-    } catch (err) {
-      toast({
-        title: "Connection Error",
-        description: "Could not reach the server. Please check your internet.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <Layout>
@@ -343,102 +189,18 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Contact Form */}
+            {/* Contact Form (Zoho Forms embed -> Zoho CRM Leads) */}
             <div className="lg:col-span-3">
               <div className="dashboard-card p-8">
-                <h3 className="text-xl font-display font-semibold text-foreground mb-6">
-                  {form.heading}
-                </h3>
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name *</Label>
-                    <Input
-                      id="name"
-                      placeholder="Your name"
-                      required
-                      value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
-                      className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
-                    />
-                    {errors.name && <p className="text-xs text-red-500 font-medium">{errors.name}</p>}
-                  </div>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+91 XXXXX XXXXX"
-                        required
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                        className={errors.phone ? "border-red-500 focus-visible:ring-red-500" : ""}
-                      />
-                      {errors.phone && <p className="text-xs text-red-500 font-medium">{errors.phone}</p>}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email ID *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="you@company.com"
-                        required
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        className={errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}
-                      />
-                      {errors.email && <p className="text-xs text-red-500 font-medium">{errors.email}</p>}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="service">Service *</Label>
-                    <Select
-                      onValueChange={(value) => handleInputChange('service', value)}
-                      value={formData.service}
-                    >
-                      <SelectTrigger className={errors.service ? "border-red-500 focus:ring-red-500" : ""}>
-                        <SelectValue placeholder="Select a service" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {services.map(service => (
-                          <SelectItem key={service.id} value={service.title}>{service.title}</SelectItem>
-                        ))}
-                        <SelectItem value="Others">Others</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {errors.service && <p className="text-xs text-red-500 font-medium">{errors.service}</p>}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message">{form.message_label}</Label>
-                    <Textarea
-                      id="message"
-                      placeholder={form.message_placeholder}
-                      rows={4}
-                      onChange={(e) => handleInputChange('message', e.target.value)}
-                      className={errors.message ? "border-red-500 focus-visible:ring-red-500" : ""}
-                    />
-                    {errors.message && <p className="text-xs text-red-500 font-medium">{errors.message}</p>}
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="btn-primary w-full"
-                    size="lg"
-                    disabled={isSubmitting || !isFormValid()}
-                  >
-                    {isSubmitting ? (
-                      "Submitting..."
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5 mr-2" />
-                        {form.submit_label}
-                      </>
-                    )}
-                  </Button>
-                </form>
+             
+                <iframe
+                  title="TrusComp Compliance Enquiry Form"
+                  aria-label="TrusComp-Website"
+                  src={form.zoho_url}
+                  scrolling="no"
+                  style={{ height: form.height, width: "100%", border: "none", overflow: "hidden" }}
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>
@@ -479,7 +241,33 @@ const Contact = () => {
                         {team.phone_display}
                       </a>
                     </div>
+                    <div className="flex items-center gap-3 group/item">
+                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-all duration-300">
+                        <Mail className="w-5 h-5" />
+                      </div>
+                      <a href={`mailto:${team.email}`} className="text-base text-slate-300 hover:text-white transition-colors font-medium">
+                        {team.email}
+                      </a>
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Vertical Divider (Desktop Only) */}
+              <div className="hidden lg:block w-px h-32 bg-slate-800" />
+
+              {/* QR Code Section */}
+              <div className="flex flex-col items-center gap-4 text-center shrink-0">
+                <div className="bg-white p-3.5 rounded-2xl shadow-2xl transition-all hover:scale-105 duration-500">
+                  <img
+                    src={(qrCode as any).src || qrCode}
+                    alt="Connect QR Code"
+                    className="w-28 h-28 lg:w-32 lg:h-32 object-contain"
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white mb-0.5">{team.qr_title}</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-medium">{team.qr_subtitle}</p>
                 </div>
               </div>
 
@@ -504,47 +292,6 @@ const Contact = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* Success Popup */}
-      <AnimatePresence>
-        {isSubmitted && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative text-center"
-            >
-              <button
-                onClick={() => setIsSubmitted(false)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
-                title="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 className="w-10 h-10 text-success" />
-              </div>
-
-              <h3 className="text-2xl font-display font-bold text-slate-900 mb-3">
-                {success.title}
-              </h3>
-
-              <p className="text-slate-600 mb-8 leading-relaxed">
-                {success.description}
-              </p>
-
-              <Button
-                onClick={() => setIsSubmitted(false)}
-                className="btn-primary w-full"
-              >
-                {success.button_label}
-              </Button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </Layout>
   );
 };

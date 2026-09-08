@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useSettings } from "./useSettings";
+import { mergePreservingUnknown } from "@/lib/mergeContent";
 
 /**
  * Reads one admin-managed settings record (the same key/value store behind
@@ -23,7 +24,10 @@ export function useSettingValue<T extends object>(key: string, fallback: T): T {
         const stored = (settings as Record<string, unknown> | undefined)?.[key];
 
         if (stored && typeof stored === "object" && !Array.isArray(stored)) {
-            return { ...fallback, ...(stored as Partial<T>) };
+            // Deep merge: a stored section must not wipe fields added to the
+            // shipped copy after that record was saved. Arrays are taken whole
+            // from the stored value, since a saved list is authoritative.
+            return mergePreservingUnknown(fallback, stored) as T;
         }
 
         return fallback;
