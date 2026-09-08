@@ -259,6 +259,7 @@ const HomeContentManager = () => {
                             label="Services"
                             hint={`Only the first ${SERVICE_SLOT_COUNT} are shown. Keep titles short — long ones overflow the orbit and overlap the core.`}
                             items={services.items}
+                            itemLabel={(item) => item.title}
                             blank={() => ({ title: "", descriptor: "", outcomes: [], href: "/services" })}
                             onChange={(items) => patch("services", { items })}
                             renderItem={(item, update) => (
@@ -322,6 +323,7 @@ const HomeContentManager = () => {
                             label="Pillars"
                             hint="Four per row on desktop — keep to four for an even row."
                             items={why_choose.pillars}
+                            itemLabel={(item) => item.title}
                             blank={() => ({ icon: "Shield" as PillarIconName, title: "", description: "" })}
                             onChange={(pillars) => patch("why_choose", { pillars })}
                             renderItem={(item, update) => (
@@ -393,6 +395,7 @@ const HomeContentManager = () => {
                             label="Logos"
                             hint="The marquee loops, so any number works. Transparent PNGs look best on the dark band."
                             items={clients.logos}
+                            itemLabel={(item) => item.name}
                             blank={() => ({ name: "", logo: "" })}
                             onChange={(logos) => patch("clients", { logos })}
                             renderItem={(item, update) => (
@@ -415,6 +418,7 @@ const HomeContentManager = () => {
                             label="Stats"
                             hint="The figures under the marquee."
                             items={clients.stats}
+                            itemLabel={(item) => [item.value, item.label].filter(Boolean).join(" — ")}
                             blank={() => ({ value: "", label: "" })}
                             onChange={(stats) => patch("clients", { stats })}
                             renderItem={(item, update) => (
