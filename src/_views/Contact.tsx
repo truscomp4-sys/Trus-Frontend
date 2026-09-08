@@ -1,7 +1,7 @@
 'use client'
 
 import Layout from "@/components/layout/Layout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   validateName,
   validateEmail,
@@ -25,6 +25,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MapPin, Send, CheckCircle2, X, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSEO } from "@/hooks/useSEO";
+import { useSettingValue } from "@/hooks/useSettingValue";
+import { useHasMounted } from "@/hooks/useHasMounted";
+import { CONTACT_CONTENT_KEY, DEFAULT_CONTACT_CONTENT } from "@/lib/contactContent";
 
 interface Service {
   id: number;
@@ -37,9 +40,33 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
+  const hasMounted = useHasMounted();
+
+  // Randomised decoration, so it is generated once on the client only: on the
+  // server it would not match the markup React hydrates, and recomputing it on
+  // render would make the dots jump on every keystroke in the form.
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 15 }, () => ({
+        size: Math.random() * 8 + 4,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        drift: Math.random() * 40 - 20,
+        duration: 6 + Math.random() * 4,
+        delay: Math.random() * 5,
+      })),
+    []
+  );
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const { data: settings } = useSettings();
+
+  // Page copy from the admin panel; address/phone/email still come from
+  // System Settings and the service list from Admin > Services.
+  const { hero, info, form, team, success } = useSettingValue(
+    CONTACT_CONTENT_KEY,
+    DEFAULT_CONTACT_CONTENT
+  );
 
   const [formData, setFormData] = useState({
     name: "",
@@ -185,29 +212,30 @@ const Contact = () => {
           />
 
           {/* Animated Dots/Particles */}
-          {[...Array(15)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full bg-primary/20"
-              style={{
-                width: Math.random() * 8 + 4 + "px",
-                height: Math.random() * 8 + 4 + "px",
-                left: Math.random() * 100 + "%",
-                top: Math.random() * 100 + "%",
-              }}
-              animate={{
-                y: [0, -80, 0],
-                x: [0, Math.random() * 40 - 20, 0],
-                opacity: [0, 0.4, 0],
-              }}
-              transition={{
-                duration: 6 + Math.random() * 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: Math.random() * 5,
-              }}
-            />
-          ))}
+          {hasMounted &&
+            particles.map((p, i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full bg-primary/20"
+                style={{
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  left: `${p.left}%`,
+                  top: `${p.top}%`,
+                }}
+                animate={{
+                  y: [0, -80, 0],
+                  x: [0, p.drift, 0],
+                  opacity: [0, 0.4, 0],
+                }}
+                transition={{
+                  duration: p.duration,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: p.delay,
+                }}
+              />
+            ))}
         </div>
 
         <div className="section-container relative z-10">
@@ -218,7 +246,7 @@ const Contact = () => {
               animate={{ opacity: 1, y: 0 }}
               className="inline-block px-4 py-1.5 rounded-full bg-orange-50 text-primary text-sm font-medium border border-orange-100 mb-6"
             >
-              Contact Us
+              {hero.badge}
             </motion.span>
 
             <motion.h1
@@ -227,7 +255,7 @@ const Contact = () => {
               transition={{ delay: 0.1 }}
               className="text-5xl lg:text-7xl font-display font-bold text-slate-900 mb-6 tracking-tight"
             >
-              Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-500">Touch</span>
+              {hero.headline_prefix} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-500">{hero.headline_highlight}</span>
             </motion.h1>
 
             <motion.p
@@ -236,7 +264,7 @@ const Contact = () => {
               transition={{ delay: 0.2 }}
               className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed"
             >
-              Ready to simplify your compliance? We're here to help you navigate complex labor laws with ease.
+              {hero.description}
             </motion.p>
           </div>
 
@@ -247,11 +275,10 @@ const Contact = () => {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8 group-hover:scale-110 transition-transform duration-500" />
 
                 <h2 className="text-2xl font-display font-bold text-slate-900 mb-6 relative z-10">
-                  Contact Information
+                  {info.heading}
                 </h2>
                 <p className="text-slate-600 mb-8 relative z-10">
-                  Reach out to us for a free compliance consultation.
-                  Our experts are ready to help.
+                  {info.description}
                 </p>
 
                 <div className="space-y-6 relative z-10">
@@ -320,7 +347,7 @@ const Contact = () => {
             <div className="lg:col-span-3">
               <div className="dashboard-card p-8">
                 <h3 className="text-xl font-display font-semibold text-foreground mb-6">
-                  Compliance Enquiry Form
+                  {form.heading}
                 </h3>
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-2">
@@ -385,10 +412,10 @@ const Contact = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Tell us about your compliance needs</Label>
+                    <Label htmlFor="message">{form.message_label}</Label>
                     <Textarea
                       id="message"
-                      placeholder="Describe your current compliance challenges..."
+                      placeholder={form.message_placeholder}
                       rows={4}
                       onChange={(e) => handleInputChange('message', e.target.value)}
                       className={errors.message ? "border-red-500 focus-visible:ring-red-500" : ""}
@@ -407,7 +434,7 @@ const Contact = () => {
                     ) : (
                       <>
                         <Send className="w-5 h-5 mr-2" />
-                        Submit Request
+                        {form.submit_label}
                       </>
                     )}
                   </Button>
@@ -433,14 +460,14 @@ const Contact = () => {
                 <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                   <h4 className="font-display font-semibold text-white tracking-widest uppercase text-[10px]">
-                    Connect with Our Team
+                    {team.eyebrow}
                   </h4>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-3xl font-display font-bold text-white tracking-tight">Ms. Swetha</h3>
-                    <p className="text-primary text-sm font-semibold mt-1">Business Development</p>
+                    <h3 className="text-3xl font-display font-bold text-white tracking-tight">{team.name}</h3>
+                    <p className="text-primary text-sm font-semibold mt-1">{team.role}</p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 pt-2">
@@ -448,8 +475,8 @@ const Contact = () => {
                       <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-all duration-300">
                         <Phone className="w-5 h-5" />
                       </div>
-                      <a href="tel:+919080966206" className="text-sm text-slate-300 hover:text-white transition-colors font-medium">
-                        90809 66206
+                      <a href={`tel:${team.phone_link}`} className="text-sm text-slate-300 hover:text-white transition-colors font-medium">
+                        {team.phone_display}
                       </a>
                     </div>
                   </div>
@@ -462,15 +489,15 @@ const Contact = () => {
               {/* WhatsApp Call to Action */}
               <div className="flex-shrink-0 flex flex-col items-center lg:items-start gap-4">
                 <div className="text-center lg:text-left">
-                  <p className="text-lg font-display font-bold text-white mb-1">Quick WhatsApp Access</p>
-                  <p className="text-xs text-slate-400 max-w-[200px] leading-relaxed">Have urgent compliance questions? Chat with our experts directly for instant support.</p>
+                  <p className="text-lg font-display font-bold text-white mb-1">{team.whatsapp_heading}</p>
+                  <p className="text-xs text-slate-400 max-w-[200px] leading-relaxed">{team.whatsapp_description}</p>
                 </div>
                 <Button
-                  onClick={() => window.open('https://wa.me/919080966206', '_blank')}
+                  onClick={() => window.open(`https://wa.me/${team.whatsapp_number}`, '_blank')}
                   className="bg-[#25D366] hover:bg-[#20ba59] text-white border-0 h-12 px-8 rounded-xl font-bold transition-all shadow-xl shadow-emerald-500/10 group/wa w-full sm:w-auto"
                 >
                   <MessageCircle className="w-5 h-5 mr-2 group-hover/wa:rotate-12 transition-transform" />
-                  Message on WhatsApp
+                  {team.whatsapp_button_label}
                 </Button>
               </div>
             </div>
@@ -501,18 +528,18 @@ const Contact = () => {
               </div>
 
               <h3 className="text-2xl font-display font-bold text-slate-900 mb-3">
-                Submission Successful
+                {success.title}
               </h3>
 
               <p className="text-slate-600 mb-8 leading-relaxed">
-                Your compliance request has been submitted successfully. Our team will review your details and reach out to you shortly.
+                {success.description}
               </p>
 
               <Button
                 onClick={() => setIsSubmitted(false)}
                 className="btn-primary w-full"
               >
-                Great, Thank You
+                {success.button_label}
               </Button>
             </motion.div>
           </div>

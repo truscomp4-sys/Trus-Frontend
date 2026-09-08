@@ -3,51 +3,49 @@
 import { useRef, useEffect, useState } from "react";
 import Link from 'next/link';
 import { cn } from "@/lib/utils";
+import { DEFAULT_HOME_CONTENT, type HomeServicesContent, type HomeServiceItem } from "@/lib/homeContent";
 
-// ----- SERVICE DATA -----
-// ----- SERVICE DATA -----
-const services = [
+// ----- ORBIT SLOTS -----
+// The layout is a fixed six-point orbit around the core, so where a node sits,
+// which way its hover panel opens and which icon it gets are positional facts
+// that stay in code. Only the copy comes from the admin panel, and only the
+// first SLOTS.length services are rendered.
+const SLOTS = [
     {
-        id: "labor-law-compliance",
-        title: "Labor Law Compliance",
-        descriptor: "Expert-led solutions tailored for businesses leveraging automation.",
-        outcomes: ["Zero Risk", "Automated Workflows", "Audit Ready"],
-        position: { desktop: { top: "10%", left: "50%", transform: "translateX(-50%)" }, angle: 270 }
+        desktop: { top: "10%", left: "50%", transform: "translateX(-50%)" },
+        angle: 270,
+        panelAbove: false,
+        iconPath: "M9 12l2 2 4-4 M12 3v1m6.364 1.636l-.707.707M21 12h-1M18.364 18.364l-.707-.707M12 21v-1M4.636 18.364l.707-.707M3 12h1M5.636 4.636l.707.707"
     },
     {
-        id: "records-registers",
-        title: "Records & Registers",
-        descriptor: "Automated solutions for managing mandatory records.",
-        outcomes: ["100% Adherence", "Cloud Storage", "Audit Ready"],
-        position: { desktop: { top: "25%", right: "8%" }, angle: 330 }
+        desktop: { top: "25%", right: "8%" },
+        angle: 330,
+        panelAbove: false,
+        iconPath: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
     },
     {
-        id: "licenses-registrations",
-        title: "Licenses & Registrations",
-        descriptor: "Simplifies licensing, renewals, and amendments seamlessly.",
-        outcomes: ["Real-Time Tracking", "Expert Support", "No Disruptions"],
-        position: { desktop: { bottom: "25%", right: "8%" }, angle: 30 }
+        desktop: { bottom: "25%", right: "8%" },
+        angle: 30,
+        panelAbove: true,
+        iconPath: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
     },
     {
-        id: "vendor-audit",
-        title: "Vendor Audit",
-        descriptor: "Streamlines vendor audits for supply chain visibility.",
-        outcomes: ["Safe Supply Chain", "Risk Categorization", "Liability Check"],
-        position: { desktop: { bottom: "10%", left: "50%", transform: "translateX(-50%)" }, angle: 90 }
+        desktop: { bottom: "10%", left: "50%", transform: "translateX(-50%)" },
+        angle: 90,
+        panelAbove: true,
+        iconPath: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
     },
     {
-        id: "payroll-compliance",
-        title: "Payroll Compliance",
-        descriptor: "Advanced automation for error-free payroll processing.",
-        outcomes: ["Zero Errors", "Precise Deductions", "Real-Time Tracking"],
-        position: { desktop: { bottom: "25%", left: "8%" }, angle: 150 }
+        desktop: { bottom: "25%", left: "8%" },
+        angle: 150,
+        panelAbove: true,
+        iconPath: "M9 7h6m-6 4h6m-6 4h4m-7 4h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
     },
     {
-        id: "remittances-returns",
-        title: "Remittances & Returns",
-        descriptor: "Automated processes for timely remittances and returns.",
-        outcomes: ["Multi-State Adherence", "Audit Trails", "Reduced Overhead"],
-        position: { desktop: { top: "25%", left: "8%" }, angle: 210 }
+        desktop: { top: "25%", left: "8%" },
+        angle: 210,
+        panelAbove: false,
+        iconPath: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
     }
 ];
 
@@ -178,13 +176,15 @@ const ConnectorLine = ({ angle, isVisible, isActive }: { angle: number, isVisibl
 // ----- SERVICE LABEL (FLOATING) -----
 const ServiceLabel = ({
     service,
+    slot,
     index,
     isVisible,
     isActive,
     onHover,
     onLeave
 }: {
-    service: typeof services[0],
+    service: HomeServiceItem,
+    slot: typeof SLOTS[number],
     index: number,
     isVisible: boolean,
     isActive: boolean,
@@ -195,7 +195,7 @@ const ServiceLabel = ({
 
     return (
         <Link
-            href={`/services/${service.id}`}
+            href={service.href}
             className={cn(
                 "absolute hidden lg:block transition-all duration-700 cursor-pointer",
                 isVisible ? "opacity-100" : "opacity-0 translate-y-4",
@@ -203,7 +203,7 @@ const ServiceLabel = ({
                 isActive || showOutcomes ? "z-50" : "z-10"
             )}
             style={{
-                ...service.position.desktop,
+                ...slot.desktop,
                 transitionDelay: isVisible ? `${index * 150}ms` : '0ms'
             }}
             onMouseEnter={() => { onHover(); setShowOutcomes(true); }}
@@ -240,11 +240,9 @@ const ServiceLabel = ({
             {/* Floating Outcome Panel - Position based on service location */}
             <div className={cn(
                 "absolute p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-border/50 transition-all duration-300 min-w-[180px] z-20",
-                // Position panel to avoid overlap with CTA
-                // For bottom items (Vendor Audit, Payroll, Licenses), show panel ABOVE the label
-                (service.id === 'vendor-audit' || service.id === 'payroll-compliance' || service.id === 'licenses-registrations')
-                    ? 'bottom-full mb-2'
-                    : 'mt-3',
+                // Position panel to avoid overlap with CTA: nodes sitting on the
+                // lower half of the orbit open their panel upwards.
+                slot.panelAbove ? 'bottom-full mb-2' : 'mt-3',
                 showOutcomes && isActive ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
             )}>
                 {service.outcomes.map((outcome, i) => (
@@ -265,24 +263,16 @@ const ServiceLabel = ({
 // ----- MOBILE/TABLET SERVICE ITEM -----
 const MobileServiceItem = ({
     service,
+    slot,
     index,
     isVisible
 }: {
-    service: typeof services[0],
+    service: HomeServiceItem,
+    slot: typeof SLOTS[number],
     index: number,
     isVisible: boolean
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-
-    // Service-specific icon paths
-    const iconPaths: Record<string, string> = {
-        "labor-law-compliance": "M9 12l2 2 4-4 M12 3v1m6.364 1.636l-.707.707M21 12h-1M18.364 18.364l-.707-.707M12 21v-1M4.636 18.364l.707-.707M3 12h1M5.636 4.636l.707.707",
-        "records-registers": "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
-        "licenses-registrations": "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
-        "vendor-audit": "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
-        "payroll-compliance": "M9 7h6m-6 4h6m-6 4h4m-7 4h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z",
-        "remittances-returns": "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-    };
 
     // Premium mobile palette
     const bgColors = ["bg-[#FFFFFF]", "bg-[#FFF6EC]", "bg-[#FAF3E8]"];
@@ -308,7 +298,7 @@ const MobileServiceItem = ({
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" className="w-6 h-6 text-primary">
                             <path
-                                d={iconPaths[service.id] || iconPaths["labor-law-compliance"]}
+                                d={slot.iconPath}
                                 fill="none"
                                 stroke="currentColor"
                                 strokeWidth="1.5"
@@ -323,7 +313,7 @@ const MobileServiceItem = ({
                             {service.title}
                         </h3>
                         <p className="text-[11px] font-medium text-slate-500 mt-0.5">
-                            {service.descriptor.slice(0, 45)}...
+                            {service.descriptor.slice(0, 45)}{service.descriptor.length > 45 ? "..." : ""}
                         </p>
                     </div>
 
@@ -361,7 +351,7 @@ const MobileServiceItem = ({
                             ))}
                         </div>
                         <Link
-                            href={`/services/${service.id}`}
+                            href={service.href}
                             className="inline-flex items-center text-xs font-bold text-primary hover:underline"
                             onClick={(e) => e.stopPropagation()}
                         >
@@ -375,10 +365,13 @@ const MobileServiceItem = ({
 };
 
 // ----- MAIN COMPONENT -----
-const LivingComplianceSystem = (_props: Record<string, unknown> = {}) => {
+const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { content?: HomeServicesContent }) => {
     const sectionRef = useRef<HTMLDivElement>(null);
     const [isInView, setIsInView] = useState(false);
     const [activeService, setActiveService] = useState<string | null>(null);
+
+    // The orbit has a fixed number of positions; anything beyond them is dropped.
+    const services = content.items.slice(0, SLOTS.length);
 
     // Intersection Observer for scroll-triggered animations
     useEffect(() => {
@@ -413,11 +406,11 @@ const LivingComplianceSystem = (_props: Record<string, unknown> = {}) => {
             )}>
                 <div className="inline-flex items-center gap-2 mb-4">
                     <span className="h-[2px] w-8 bg-primary rounded-full" />
-                    <span className="text-sm font-semibold uppercase tracking-widest text-primary">Our Services</span>
+                    <span className="text-sm font-semibold uppercase tracking-widest text-primary">{content.eyebrow}</span>
                     <span className="h-[2px] w-8 bg-primary rounded-full" />
                 </div>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white">
-                    Our Compliance <span className="text-primary"> Solutions </span>
+                    {content.heading_prefix} <span className="text-primary"> {content.heading_highlight} </span>
                 </h2>
             </div>
 
@@ -427,24 +420,25 @@ const LivingComplianceSystem = (_props: Record<string, unknown> = {}) => {
                 <ComplianceCore isVisible={isInView} />
 
                 {/* Connector Lines */}
-                {services.map((service) => (
+                {services.map((service, index) => (
                     <ConnectorLine
-                        key={`line-${service.id}`}
-                        angle={service.position.angle}
+                        key={`line-${service.title}-${index}`}
+                        angle={SLOTS[index].angle}
                         isVisible={isInView}
-                        isActive={activeService === service.id}
+                        isActive={activeService === service.title}
                     />
                 ))}
 
                 {/* Service Labels */}
                 {services.map((service, index) => (
                     <ServiceLabel
-                        key={service.id}
+                        key={`${service.title}-${index}`}
                         service={service}
+                        slot={SLOTS[index]}
                         index={index}
                         isVisible={isInView}
-                        isActive={activeService === service.id || activeService === null}
-                        onHover={() => setActiveService(service.id)}
+                        isActive={activeService === service.title || activeService === null}
+                        onHover={() => setActiveService(service.title)}
                         onLeave={() => setActiveService(null)}
                     />
                 ))}
@@ -462,8 +456,9 @@ const LivingComplianceSystem = (_props: Record<string, unknown> = {}) => {
                 <div className="relative space-y-4">
                     {services.map((service, index) => (
                         <MobileServiceItem
-                            key={service.id}
+                            key={`${service.title}-${index}`}
                             service={service}
+                            slot={SLOTS[index]}
                             index={index}
                             isVisible={isInView}
                         />
@@ -485,7 +480,7 @@ const LivingComplianceSystem = (_props: Record<string, unknown> = {}) => {
                     {/* Glow */}
                     <span className="absolute inset-0 rounded-full bg-primary/20 blur-xl group-hover:blur-2xl transition-all duration-500 -z-10" />
 
-                    <span className="relative">Explore All Services</span>
+                    <span className="relative">{content.cta_label}</span>
                     <svg className="relative w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>

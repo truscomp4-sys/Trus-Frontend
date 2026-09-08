@@ -1,37 +1,37 @@
 'use client'
 
-import { Shield, Award, Settings, TrendingUp, ArrowRight } from "lucide-react";
+import {
+  Shield,
+  Award,
+  Settings,
+  TrendingUp,
+  Zap,
+  Users,
+  Target,
+  CheckCircle2,
+  Clock,
+  Lock,
+  ArrowRight,
+} from "lucide-react";
 import AnimatedSection from "@/components/ui/animated-section";
 import Link from 'next/link';
+import type { WhyChooseContent, PillarIconName } from "@/lib/homeContent";
 
-const pillars = [
-  {
-    icon: Shield,
-    title: "Comprehensive Solutions",
-    description: "End-to-end compliance management covering all aspects of labor law requirements.",
-    gradient: "from-primary via-primary/80 to-accent",
-  },
-  {
-    icon: Award,
-    title: "Trusted Expertise",
-    description: "Team of seasoned professionals with deep expertise in labor laws and regulations.",
-    gradient: "from-accent via-accent/80 to-success",
-  },
-  {
-    icon: Settings,
-    title: "Customizable Approach",
-    description: "Tailored solutions that adapt to your specific industry and business needs.",
-    gradient: "from-success via-success/80 to-info",
-  },
-  {
-    icon: TrendingUp,
-    title: "Proven Track Record",
-    description: "Consistent delivery of results with 100+ satisfied clients across industries.",
-    gradient: "from-info via-info/80 to-primary",
-  },
+// Icons arrive from the admin as names; anything unrecognised falls back to Shield.
+const ICONS: Record<PillarIconName, typeof Shield> = {
+  Shield, Award, Settings, TrendingUp, Zap, Users, Target, CheckCircle2, Clock, Lock,
+};
+
+// Card gradients are positional, so the palette stays in code and cycles for
+// however many pillars are saved.
+const GRADIENTS = [
+  "from-primary via-primary/80 to-accent",
+  "from-accent via-accent/80 to-success",
+  "from-success via-success/80 to-info",
+  "from-info via-info/80 to-primary",
 ];
 
-const WhyChooseUs = () => {
+const WhyChooseUs = ({ content }: { content: WhyChooseContent }) => {
   return (
     <section className="relative py-20 lg:py-28 overflow-hidden">
       {/* Animated background */}
@@ -46,27 +46,29 @@ const WhyChooseUs = () => {
         {/* Header */}
         <AnimatedSection className="text-center mb-16">
           <h2 className="text-3xl lg:text-5xl font-display font-bold text-foreground mb-4">
-            Why Choose <span className="gradient-text">TrusComp?</span>
+            {content.heading_prefix} <span className="gradient-text">{content.heading_highlight}</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            We combine technology innovation with compliance expertise to deliver 
-            unmatched value for your business.
+            {content.description}
           </p>
         </AnimatedSection>
 
         {/* Pillars Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {pillars.map((pillar, index) => (
-            <AnimatedSection key={index} animation="fade-up" delay={index * 100}>
+          {content.pillars.map((pillar, index) => {
+            const Icon = ICONS[pillar.icon as PillarIconName] || Shield;
+            const gradient = GRADIENTS[index % GRADIENTS.length];
+            return (
+            <AnimatedSection key={`${pillar.title}-${index}`} animation="fade-up" delay={index * 100}>
               <div 
                 className="group relative text-center p-8 rounded-2xl bg-card/80 backdrop-blur-sm border border-border hover:border-primary/30 transition-all duration-500 hover:shadow-glow overflow-hidden h-full"
               >
                 {/* Hover gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${pillar.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
                 
                 {/* Icon */}
-                <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${pillar.gradient} flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg`}>
-                  <pillar.icon className="w-8 h-8 text-primary-foreground" />
+                <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg`}>
+                  <Icon className="w-8 h-8 text-primary-foreground" />
                 </div>
                 
                 {/* Content */}
@@ -81,7 +83,8 @@ const WhyChooseUs = () => {
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-500" />
               </div>
             </AnimatedSection>
-          ))}
+            );
+          })}
         </div>
 
         {/* CTA */}
@@ -90,7 +93,7 @@ const WhyChooseUs = () => {
             href="/about" 
             className="inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all group"
           >
-            Learn More About Us
+            {content.link_label}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </AnimatedSection>

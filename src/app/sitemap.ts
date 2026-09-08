@@ -41,10 +41,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   try {
-    const [servicesRes, blogsRes, updatesRes] = await Promise.allSettled([
+    const [servicesRes, blogsRes, updatesRes, complianceRes] = await Promise.allSettled([
       fetchWithTimeout(`${API}/services?public_view=true`, { next: { revalidate: 3600 } }),
       fetchWithTimeout(`${API}/blogs?status=active&limit=100`, { next: { revalidate: 3600 } }),
       fetchWithTimeout(`${API}/labour-law-updates?status=active&limit=100`, { next: { revalidate: 3600 } }),
+      fetchWithTimeout(`${API}/compliance`, { next: { revalidate: 3600 } }),
     ])
 
     const dynamicRoutes: MetadataRoute.Sitemap = []
@@ -80,8 +81,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const list = json.data ?? json
       for (const u of Array.isArray(list) ? list : []) {
         dynamicRoutes.push({
-          url: `${BASE_URL}/updates/${u.slug ?? u.id}`,
+          url: `${BASE_URL}/resources/monthly-labour-law/${u.id}`,
           lastModified: u.updated_at ? new Date(u.updated_at) : new Date(),
+          priority: 0.6,
+          changeFrequency: 'weekly',
+        })
+      }
+    }
+
+    // /updates/<slug> renders the compliance bulletins.
+    if (complianceRes.status === 'fulfilled' && complianceRes.value.ok) {
+      const json = await complianceRes.value.json()
+      const list = json.data ?? json
+      for (const c of Array.isArray(list) ? list : []) {
+        if (c.status && c.status !== 'published') continue
+        dynamicRoutes.push({
+          url: `${BASE_URL}/updates/${c.slug ?? c.id}`,
+          lastModified: c.updated_at ? new Date(c.updated_at) : new Date(),
           priority: 0.6,
           changeFrequency: 'weekly',
         })

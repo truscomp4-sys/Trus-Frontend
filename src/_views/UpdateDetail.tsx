@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link';
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,17 +10,62 @@ import {
     ChevronRight,
     Sparkles,
     ShieldAlert,
-    Timer
+    Timer,
+    Building2,
+    ClipboardCheck,
+    Scale,
+    FileText,
+    type LucideIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { complianceUpdates } from "@/data/complianceData";
 import NotFound from "./NotFound";
 
 import { useSEO } from "@/hooks/useSEO";
 
+// Records come from Admin > Compliance Updates. The API stores a category
+// string rather than an icon, so the mark is chosen from it here.
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+    PF: Building2,
+    ESIC: ClipboardCheck,
+    Payroll: Scale,
+    Inspections: FileText,
+};
+
+interface ComplianceUpdate {
+    slug: string;
+    title: string;
+    summary: string;
+    category: string;
+    date_text: string;
+    impact: string;
+    action_required: string;
+    overview_content: string;
+    what_changed_content: string;
+    who_it_impacts_content: string;
+    what_you_should_do_content: string;
+}
+
 const UpdateDetail = ({ id: slug }: { id: string }) => {
     useSEO("labour_law_update", slug);
-    const update = complianceUpdates.find(u => u.slug === slug);
+
+    const [update, setUpdate] = useState<ComplianceUpdate | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
+        fetch(`${apiBase}/compliance`)
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                const list = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+                const match = list.find(
+                    (u: any) => String(u?.slug) === slug || String(u?.id) === slug
+                );
+                setUpdate(match ?? null);
+            })
+            .catch(() => setUpdate(null))
+            .finally(() => setIsLoading(false));
+    }, [slug]);
 
     const observerRefs = useRef<(HTMLElement | null)[]>([]);
 
@@ -45,15 +90,27 @@ const UpdateDetail = ({ id: slug }: { id: string }) => {
         return () => observer.disconnect();
     }, [update]);
 
+    if (isLoading) {
+        return (
+            <Layout>
+                <div className="min-h-[60vh] flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+                </div>
+            </Layout>
+        );
+    }
+
     if (!update) {
         return <NotFound />;
     }
 
+    const CategoryIcon = CATEGORY_ICONS[update.category] || FileText;
+
     const sections = [
-        { title: "Overview", content: update.content.overview },
-        { title: "What Changed", content: update.content.whatChanged },
-        { title: "Who It Impacts", content: update.content.whoItImpacts },
-        { title: "What You Should Do", content: update.content.whatYouShouldDo },
+        { title: "Overview", content: update.overview_content },
+        { title: "What Changed", content: update.what_changed_content },
+        { title: "Who It Impacts", content: update.who_it_impacts_content },
+        { title: "What You Should Do", content: update.what_you_should_do_content },
     ];
 
     return (
@@ -83,7 +140,7 @@ const UpdateDetail = ({ id: slug }: { id: string }) => {
                             {/* Hero Section */}
                             <header className="mb-12">
                                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4 animate-fade-in">
-                                    <update.icon className="w-4 h-4" />
+                                    <CategoryIcon className="w-4 h-4" />
                                     {update.category} Update
                                 </span>
                                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-extrabold text-foreground leading-[1.1] mb-6 relative">
@@ -162,7 +219,7 @@ const UpdateDetail = ({ id: slug }: { id: string }) => {
                                         <Timer className="w-5 h-5 text-accent" />
                                         <div>
                                             <p className="text-[10px] font-bold text-accent/70 uppercase">Priority</p>
-                                            <p className="text-sm font-semibold text-accent">{update.actionRequired}</p>
+                                            <p className="text-sm font-semibold text-accent">{update.action_required}</p>
                                         </div>
                                     </div>
 
@@ -178,7 +235,7 @@ const UpdateDetail = ({ id: slug }: { id: string }) => {
 
                             <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/5">
                                 <p className="text-xs text-muted-foreground uppercase tracking-widest mb-4">Last Updated</p>
-                                <p className="text-sm font-medium text-foreground">{update.date}</p>
+                                <p className="text-sm font-medium text-foreground">{update.date_text}</p>
                             </div>
                         </aside>
                     </div>
