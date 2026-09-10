@@ -13,7 +13,7 @@ const FloatingCTA = () => {
   const handleWhatsAppClick = () => {
     if (!whatsappNumber) return;
     const cleanNumber = whatsappNumber.replace(/[^\d+]/g, "");
-    const message = encodeURIComponent("Hello, I need help regarding your services.");
+    const message = encodeURIComponent("Hello, I would like to learn more about your services.");
     window.open(`https://wa.me/${cleanNumber}?text=${message}`, "_blank");
   };
 
