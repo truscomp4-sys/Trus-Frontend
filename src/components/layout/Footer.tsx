@@ -20,6 +20,7 @@ const Footer = () => {
     { name: "Testimonials", path: "/testimonials" },
     { name: "Resources", path: "/resources" },
     { name: "Contact Us", path: "/contact" },
+    { name: "Sitemap", path: "/sitemap.html" },
   ];
 
   const complianceServices = [
