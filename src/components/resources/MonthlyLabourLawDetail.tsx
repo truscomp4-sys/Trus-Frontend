@@ -3,19 +3,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from "framer-motion";
-import { ArrowLeft, Download, Play, Calendar, FileText, CheckCircle2, User, ChevronRight, ArrowRight, Sparkles, Copy, Check } from "lucide-react";
-import { cn, handleDocumentDownload } from "@/lib/utils";
+import { ArrowLeft, Download, Play, Calendar, FileText, CheckCircle2, User, ChevronRight, ArrowRight } from "lucide-react";
+import { handleDocumentDownload } from "@/lib/utils";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-} from "@/components/ui/dialog";
 import {
     Select,
     SelectContent,
@@ -51,19 +43,8 @@ const MonthlyLabourLawDetail = ({ id }: { id: string }) => {
     const router = useRouter();
     const [resource, setResource] = useState<LabourLawUpdate | null>(null);
     const [loading, setLoading] = useState(true);
-    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-    const [copied, setCopied] = useState(false);
     const [selectedYear, setSelectedYear] = useState<string>("all");
     const [selectedMonth, setSelectedMonth] = useState<string>("all");
-
-    const handleCopyLink = () => {
-        if (resource?.webinar_link) {
-            navigator.clipboard.writeText(resource.webinar_link);
-            setCopied(true);
-            toast.success("Link copied successfully!");
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
 
     const isRegistrationExpired = resource?.end_date
         ? new Date(new Date().setHours(0, 0, 0, 0)) > new Date(new Date(resource.end_date).setHours(0, 0, 0, 0))
@@ -235,19 +216,25 @@ const MonthlyLabourLawDetail = ({ id }: { id: string }) => {
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <button
-                                                            onClick={() => !isRegistrationExpired && setIsRegisterModalOpen(true)}
-                                                            disabled={isRegistrationExpired}
-                                                            className={cn(
-                                                                "relative flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-xl",
-                                                                isRegistrationExpired
-                                                                    ? "bg-gray-500 cursor-not-allowed shadow-none"
-                                                                    : "bg-[#FF8C00] shadow-orange-900/40 hover:bg-orange-600 hover:scale-[1.02] active:scale-[0.98]"
-                                                            )}
-                                                        >
-                                                            Register Now
-                                                            <ChevronRight className="w-5 h-5 stroke-[2.5]" />
-                                                        </button>
+                                                        {isRegistrationExpired ? (
+                                                            <button
+                                                                disabled
+                                                                className="relative flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 text-white text-lg font-bold rounded-xl transition-all bg-gray-500 cursor-not-allowed"
+                                                            >
+                                                                Register Now
+                                                                <ChevronRight className="w-5 h-5 stroke-[2.5]" />
+                                                            </button>
+                                                        ) : (
+                                                            <a
+                                                                href={resource.webinar_link}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="relative flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-xl bg-[#FF8C00] shadow-orange-900/40 hover:bg-orange-600 hover:scale-[1.02] active:scale-[0.98]"
+                                                            >
+                                                                Register Now
+                                                                <ChevronRight className="w-5 h-5 stroke-[2.5]" />
+                                                            </a>
+                                                        )}
                                                     </TooltipTrigger>
                                                     {isRegistrationExpired && (
                                                         <TooltipContent className="bg-slate-900 border-white/10 text-white px-4 py-2 font-bold">
@@ -519,70 +506,6 @@ const MonthlyLabourLawDetail = ({ id }: { id: string }) => {
             </main >
             <Footer />
 
-            {/* Registration Modal */}
-            <Dialog open={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
-                <DialogContent className="sm:max-w-lg bg-slate-900 border-white/10 text-white rounded-2xl overflow-hidden shadow-2xl p-0">
-                    <DialogHeader className="pt-8 px-6 pb-2">
-                        <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-                            <div className="w-10 h-10 bg-[#FF8C00]/20 rounded-xl flex items-center justify-center">
-                                <Sparkles className="w-6 h-6 text-[#FF8C00]" />
-                            </div>
-                            Webinar Registration
-                        </DialogTitle>
-                        <DialogDescription className="text-gray-400 text-base mt-2">
-                            Secure your spot for the <span className="text-white font-semibold">"{resource.title}"</span> session.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="p-6 space-y-6">
-                        <div className="bg-white/5 rounded-xl p-4 border border-white/10 space-y-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-2 h-2 bg-[#FF8C00] rounded-full animate-pulse" />
-                                <span className="text-sm font-medium text-gray-300 uppercase tracking-widest">Live Interactive Session</span>
-                            </div>
-                            <p className="text-sm text-gray-400 leading-relaxed">
-                                Join our experts for an in-depth discussion on the latest labour law updates and compliance strategies.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col gap-4">
-                            {resource.webinar_link && (
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-1">Webinar URL</label>
-                                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl p-2 focus-within:border-[#FF8C00]/50 transition-colors group/input">
-                                        <div className="flex-1 px-3 py-2 text-sm text-gray-300 break-all font-mono leading-relaxed">
-                                            {resource.webinar_link}
-                                        </div>
-                                        <button
-                                            onClick={handleCopyLink}
-                                            className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-[#FF8C00] transition-all active:scale-95"
-                                            title="Copy link"
-                                        >
-                                            {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            <button
-                                onClick={() => {
-                                    window.open(resource.webinar_link || '', '_blank');
-                                    setIsRegisterModalOpen(false);
-                                }}
-                                className="w-full py-4 bg-[#FF8C00] text-white font-bold rounded-xl shadow-lg shadow-orange-900/20 hover:bg-orange-600 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2"
-                            >
-                                {resource.webinar_link?.includes('zoom') || resource.webinar_link?.includes('meet.google')
-                                    ? "Open Meeting Link"
-                                    : "Complete Registration"}
-                                <ArrowRight className="w-5 h-5" />
-                            </button>
-                            <p className="text-center text-[11px] text-gray-500 italic">
-                                Clicking will open the registration page in a new tab safely.
-                            </p>
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </div >
     );
 };
