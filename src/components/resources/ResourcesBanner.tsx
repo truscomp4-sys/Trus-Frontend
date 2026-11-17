@@ -55,7 +55,7 @@ const ResourcesBanner = () => {
                     </h1>
 
                     <p className="text-base md:text-lg text-gray-500 font-light max-w-xl mx-auto mb-8 leading-relaxed">
-                        Navigate the complexity of Indian Labor Laws with our digital library.
+                        Navigate the complexity of Indian Labour Laws with our digital library.
                         <span className="block mt-1 font-medium text-gray-900">Updated daily. Searchable instantly.</span>
                     </p>
 

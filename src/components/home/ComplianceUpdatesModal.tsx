@@ -190,7 +190,7 @@ const ComplianceUpdatesModal = ({ open, onOpenChange }: ComplianceUpdatesModalPr
             <div className="px-6 pt-8 pb-6">
                 {/* Title with animated underline */}
                 <h2 className="text-xl md:text-2xl font-display font-bold text-foreground relative inline-block mb-3">
-                    Latest Compliance & Labor Law Updates
+                    Latest Compliance & Labour Law Updates
                     <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-gradient-to-r from-primary to-amber-400 origin-left" />
                 </h2>
 
@@ -328,7 +328,7 @@ const ComplianceUpdatesModal = ({ open, onOpenChange }: ComplianceUpdatesModalPr
                 )}>
                     <DrawerHeader className="sr-only">
                         <DrawerTitle>Compliance Updates</DrawerTitle>
-                        <DrawerDescription>Latest labor law and compliance updates</DrawerDescription>
+                        <DrawerDescription>Latest labour law and compliance updates</DrawerDescription>
                     </DrawerHeader>
                     <ModalContent />
                 </DrawerContent>
@@ -351,7 +351,7 @@ const ComplianceUpdatesModal = ({ open, onOpenChange }: ComplianceUpdatesModalPr
             )}>
                 <DialogHeader className="sr-only">
                     <DialogTitle>Compliance Updates</DialogTitle>
-                    <DialogDescription>Latest labor law and compliance updates</DialogDescription>
+                    <DialogDescription>Latest labour law and compliance updates</DialogDescription>
                 </DialogHeader>
                 <ModalContent />
             </DialogContent>

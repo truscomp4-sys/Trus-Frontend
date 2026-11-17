@@ -13,7 +13,7 @@ export interface ServiceDetail {
 export const services: ServiceDetail[] = [
     {
         id: "labor-law-compliance",
-        title: "End-to-End Labor Law Compliance Management",
+        title: "End-to-End Labour Law Compliance Management",
         category: "operations",
         overview: "Expert-led solutions tailored for businesses across India, leveraging automation for smooth and error-free operations.",
         problems: [
@@ -32,7 +32,7 @@ export const services: ServiceDetail[] = [
             { keyword: "Nationwide Adherence", text: "Compliance across all Indian states." }
         ],
         whyTrusComp: [
-            "Unmatched expertise in Indian labor laws.",
+            "Unmatched expertise in Indian labour laws.",
             "Innovative automation tools.",
             "Proven results with 100+ clients."
         ],
@@ -104,7 +104,7 @@ export const services: ServiceDetail[] = [
         ],
         features: [
             { title: "Automated Tracking", hint: "Precise calculation and tracking of obligations." },
-            { title: "Multi-State Adherence", hint: "Compliance with all state labor laws and taxes." },
+            { title: "Multi-State Adherence", hint: "Compliance with all state labour laws and taxes." },
             { title: "Real-Time Dashboard", hint: "Monitor filings across multiple locations." }
         ],
         benefits: [
@@ -184,7 +184,7 @@ export const services: ServiceDetail[] = [
             "Financial losses from unmonitored vendor obligations."
         ],
         features: [
-            { title: "200+ Audit Checkpoints", hint: "Customized based on applicable labor laws." },
+            { title: "200+ Audit Checkpoints", hint: "Customized based on applicable labour laws." },
             { title: "Risk Categorization", hint: "Evaluate vendors by High, Medium, or Low risk." },
             { title: "Automated Reporting", hint: "Simplified reporting for quick decision-making." }
         ],
@@ -223,7 +223,7 @@ export const services: ServiceDetail[] = [
         whyTrusComp: [
             "Multi-decade experience in statutory audits.",
             "Actionable, expert-led recommendations.",
-            "Comprehensive coverage of all labor acts."
+            "Comprehensive coverage of all labour acts."
         ],
         doodleType: "employer_audit"
     },
@@ -287,7 +287,7 @@ export const services: ServiceDetail[] = [
         category: "audits",
         overview: "Expert-led assessments using comprehensive frameworks to identify and prioritize potential compliance threats.",
         problems: [
-            "Undetected financial exposure from labor law gaps.",
+            "Undetected financial exposure from labour law gaps.",
             "Lack of a prioritization strategy for legal risks.",
             "Reactive management of compliance crises."
         ],
@@ -316,7 +316,7 @@ export const services: ServiceDetail[] = [
         problems: [
             "Ignorance of compliance rules among front-line staff.",
             "Weak collaboration between vendors and internal teams.",
-            "Outdated knowledge of evolving labor laws."
+            "Outdated knowledge of evolving labour laws."
         ],
         features: [
             { title: "Custom Modules", hint: "Training tailored to your business site's needs." },
@@ -342,7 +342,7 @@ export const services: ServiceDetail[] = [
         overview: "An all-in-one solution for mitigating risks and boosting efficiency through automated contractor management.",
         problems: [
             "Difficulties in tracking contractor statutory records.",
-            "Risk of project stalls due to non-compliant labor.",
+            "Risk of project stalls due to non-compliant labour.",
             "Document retrieval lag during legal inquiries."
         ],
         features: [
@@ -351,7 +351,7 @@ export const services: ServiceDetail[] = [
             { title: "Intuitive Portal", hint: "User-friendly interface for contractors/clients." }
         ],
         benefits: [
-            { keyword: "Safe Labor", text: "Guaranteed adherence to labor safety rules." },
+            { keyword: "Safe Labour", text: "Guaranteed adherence to labour safety rules." },
             { keyword: "40% Efficiency", text: "Massive reduction in admin overhead." },
             { keyword: "Real-Time", text: "Instant visibility into contractor status." }
         ],

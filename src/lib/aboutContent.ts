@@ -134,7 +134,7 @@ export const DEFAULT_ABOUT_CONTENT: AboutContent = {
         headline_prefix: "Compliance,",
         headline_highlight: "Powered by TrusComp",
         description:
-            "TrusComp Private Limited is a trusted leader in compliance solutions, combining labor law expertise, consulting, and technology to transform regulatory adherence into a competitive advantage.",
+            "TrusComp Private Limited is a trusted leader in compliance solutions, combining labour law expertise, consulting, and technology to transform regulatory adherence into a competitive advantage.",
     },
 
     core_values: {
@@ -173,7 +173,7 @@ export const DEFAULT_ABOUT_CONTENT: AboutContent = {
                 role: "Knowledge Partner",
                 image: "/images/leadership/anand-gopalan.png",
                 expertise: ["Barrister", "Industrial Relations", "Policy Reform Contributor"],
-                description: "Providing the legal backbone and deep insights into labor law complexities.",
+                description: "Providing the legal backbone and deep insights into labour law complexities.",
             },
         ],
         leadership_heading: "Operational Leadership",

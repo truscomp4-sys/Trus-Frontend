@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-// 1. Labor Law Compliance - Shield with checkmark and document
+// 1. Labour Law Compliance - Shield with checkmark and document
 export const LaborLawComplianceDoodle = () => (
     <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-primary" strokeWidth="1.8">
         {/* Shield outline */}

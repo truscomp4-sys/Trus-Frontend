@@ -55,7 +55,7 @@ export const MOCK_TESTIMONIALS: Testimonial[] = [
         clientName: "Sanjay Gupta",
         designation: "Chief Financial Officer",
         company: "Sunrise Pharma",
-        engagementType: "Strategic Labor Consulting"
+        engagementType: "Strategic Labour Consulting"
     }
 ];
 
@@ -63,7 +63,7 @@ export const WHY_CHOOSE_ITEMS: WhyChooseItem[] = [
     {
         id: "wc1",
         title: "Expert Solutions",
-        description: "Backed by decades of legal expertise in Indian Labor Laws.",
+        description: "Backed by decades of legal expertise in Indian Labour Laws.",
         icon: ShieldCheck
     },
     {

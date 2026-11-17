@@ -18,15 +18,15 @@ interface SEOData {
 }
 
 const DEFAULT_SEO: SEOData = {
-    meta_title: "TrusComp - Labor Law Compliance Solutions",
-    meta_description: "Technology-driven labor law compliance solutions. PF, ESIC, Payroll, Audits & Consulting services for businesses across India.",
-    meta_keywords: "labor law compliance, PF compliance, ESIC compliance, payroll services, HR compliance, statutory compliance India",
+    meta_title: "TrusComp - Labour Law Compliance Solutions",
+    meta_description: "Technology-driven labour law compliance solutions. PF, ESIC, Payroll, Audits & Consulting services for businesses across India.",
+    meta_keywords: "labour law compliance, PF compliance, ESIC compliance, payroll services, HR compliance, statutory compliance India",
     canonical_url: "https://www.truscomp.com",
     og_title: "TrusComp - Compliance Engineered for Confidence",
-    og_description: "Technology-driven labor law compliance solutions for businesses across India.",
+    og_description: "Technology-driven labour law compliance solutions for businesses across India.",
     og_image: "https://www.truscomp.com/og-image.jpg",
-    twitter_title: "TrusComp - Labor Law Compliance Solutions",
-    twitter_description: "Technology-driven labor law compliance solutions for businesses across India.",
+    twitter_title: "TrusComp - Labour Law Compliance Solutions",
+    twitter_description: "Technology-driven labour law compliance solutions for businesses across India.",
     robots: "index, follow",
     schema_type: "Organization"
 };

@@ -54,7 +54,7 @@ export const DEFAULT_CONTACT_CONTENT: ContactContent = {
         headline_prefix: "Get in",
         headline_highlight: "Touch",
         description:
-            "Ready to simplify your compliance? We're here to help you navigate complex labor laws with ease.",
+            "Ready to simplify your compliance? We're here to help you navigate complex labour laws with ease.",
     },
 
     info: {

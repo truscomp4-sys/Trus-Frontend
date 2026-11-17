@@ -123,7 +123,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
         headline_highlight: "Statutory",
         headline_suffix: "Compliance",
         subheadline:
-            "Reduce compliance risks, automate regulatory returns, and maintain inspection-ready records with India's trusted labor law experts.",
+            "Reduce compliance risks, automate regulatory returns, and maintain inspection-ready records with India's trusted labour law experts.",
         cta_label: "Book Free Consultation",
         trust_badges: ["100+ Clients Trust Us", "Pan-India Coverage"],
     },
@@ -135,7 +135,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
         cta_label: "Explore All Services",
         items: [
             {
-                title: "Labor Law Compliance",
+                title: "Labour Law Compliance",
                 descriptor: "Expert-led solutions tailored for businesses leveraging automation.",
                 outcomes: ["Zero Risk", "Automated Workflows", "Audit Ready"],
                 href: "/services/labor-law-compliance",
@@ -183,12 +183,12 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
             {
                 icon: "Shield",
                 title: "Comprehensive Solutions",
-                description: "End-to-end compliance management covering all aspects of labor law requirements.",
+                description: "End-to-end compliance management covering all aspects of labour law requirements.",
             },
             {
                 icon: "Award",
                 title: "Trusted Expertise",
-                description: "Team of seasoned professionals with deep expertise in labor laws and regulations.",
+                description: "Team of seasoned professionals with deep expertise in labour laws and regulations.",
             },
             {
                 icon: "Settings",

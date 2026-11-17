@@ -5,13 +5,13 @@ import SchemaRenderer from '@/components/seo/SchemaRenderer'
 import '../index.css'
 
 export const metadata: Metadata = {
-  title: 'TrusComp - Labor Law Compliance Solutions',
-  description: 'Technology-driven labor law compliance solutions. PF, ESIC, Payroll, Audits & Consulting services for businesses across India.',
-  keywords: 'labor law compliance, PF compliance, ESIC compliance, payroll services, HR compliance, statutory compliance India',
+  title: 'TrusComp - Labour Law Compliance Solutions',
+  description: 'Technology-driven labour law compliance solutions. PF, ESIC, Payroll, Audits & Consulting services for businesses across India.',
+  keywords: 'labour law compliance, PF compliance, ESIC compliance, payroll services, HR compliance, statutory compliance India',
   robots: 'index, follow',
   openGraph: {
     title: 'TrusComp - Compliance Engineered for Confidence',
-    description: 'Technology-driven labor law compliance solutions for businesses across India.',
+    description: 'Technology-driven labour law compliance solutions for businesses across India.',
     url: 'https://www.truscomp.com',
     siteName: 'TrusComp',
     images: [{ url: 'https://www.truscomp.com/og-image.jpg' }],
@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TrusComp - Labor Law Compliance Solutions',
-    description: 'Technology-driven labor law compliance solutions for businesses across India.',
+    title: 'TrusComp - Labour Law Compliance Solutions',
+    description: 'Technology-driven labour law compliance solutions for businesses across India.',
     images: ['https://www.truscomp.com/og-image.jpg'],
   },
 }

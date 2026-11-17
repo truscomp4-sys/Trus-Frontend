@@ -258,7 +258,7 @@ export const blogPosts = [
         category: "Technology",
         date: "Oct 15, 2024",
         readTime: "6 min read",
-        excerpt: "How technology is transforming labor law compliance management and reducing risks for organizations.",
+        excerpt: "How technology is transforming labour law compliance management and reducing risks for organizations.",
         imageType: "automation" as const
     },
     {

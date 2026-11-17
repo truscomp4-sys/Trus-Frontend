@@ -794,7 +794,7 @@ export const ProvidentFundView = () => {
 export const RulesView = () => {
     return (
         <div className="space-y-10">
-            <h2 className="text-3xl font-display font-black text-gray-900">Labor Rules</h2>
+            <h2 className="text-3xl font-display font-black text-gray-900">Labour Rules</h2>
 
             <div className="aspect-video bg-gray-50 rounded-[48px] border border-gray-100 flex items-center justify-center relative overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-700">
                 {/* Background decoration */}
@@ -817,7 +817,7 @@ export const RulesView = () => {
                     <div>
                         <h3 className="text-3xl font-black text-gray-900 tracking-tight mb-4">Interactive Navigation Hub</h3>
                         <p className="text-sm text-gray-500 max-w-sm mx-auto leading-relaxed font-light">
-                            Use the visual navigator to browse through state-specific labor rules and local body implementation guidelines.
+                            Use the visual navigator to browse through state-specific labour rules and local body implementation guidelines.
                         </p>
                     </div>
                     <button className="px-10 py-4 bg-primary text-white rounded-full font-black text-xs uppercase tracking-[0.2em] hover:scale-105 transition-transform shadow-lg shadow-primary/20">
