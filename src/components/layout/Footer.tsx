@@ -46,7 +46,7 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <img src={settings?.website_logo || logo.src} alt="TrusComp" className="h-10 w-auto mb-4 brightness-0 invert" />
             <p className="text-background/70 text-sm leading-relaxed mb-4">
-              Technology-driven labor law compliance solutions. Your trusted partner for regulatory excellence.
+              Technology-driven labour law compliance solutions. Your trusted partner for regulatory excellence.
             </p>
             <div className="flex gap-3">
               {settings?.social_links?.linkedin && (

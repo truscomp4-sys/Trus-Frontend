@@ -17,7 +17,7 @@ interface FAQ {
 // Shown the first time (before any custom FAQs are saved) so the admin can edit
 // the copy that currently ships hardcoded on the homepage.
 const DEFAULT_FAQS: FAQ[] = [
-    { id: 1, question: "What compliances do you handle?", answer: "We handle a comprehensive range of compliance needs including PF, ESIC, Professional Tax, Labor Welfare Fund, and all major Central and State labor laws across India." },
+    { id: 1, question: "What compliances do you handle?", answer: "We handle a comprehensive range of compliance needs including PF, ESIC, Professional Tax, Labour Welfare Fund, and all major Central and State labour laws across India." },
     { id: 2, question: "How often are filings done?", answer: "Most statutory filings are done monthly. Our system tracks every deadline and automates the preparation process to ensure zero late fees and complete accuracy." },
     { id: 3, question: "Is this applicable PAN-India?", answer: "Absolutely. Our solutions are designed to scale across all states in India, handling varied state-specific regulations and local municipal compliances seamlessly." },
     { id: 4, question: "What happens during inspections?", answer: "We provide full support during government inspections. Our digital records are audit-ready, and our team of experts provides on-ground representation to resolve queries." },

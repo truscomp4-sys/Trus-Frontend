@@ -20,9 +20,9 @@
 
 ## Services
 
-### Labor law Compliance
+### Labour law Compliance
 
-- [End-to-End Labor Law Compliance Management](https://www.truscomp.com/services/end-to-end-labor-law-compliance-management): End-to-end management of statutory obligations for organisations operating across multiple states, covering registrations, records, filings, remittances, and inspections under a single accountable framework.
+- [End-to-End Labour Law Compliance Management](https://www.truscomp.com/services/end-to-end-labor-law-compliance-management): End-to-end management of statutory obligations for organisations operating across multiple states, covering registrations, records, filings, remittances, and inspections under a single accountable framework.
 - [Wage Restructuring & Compliance Under the New Labour Codes](https://www.truscomp.com/services/wage-restructuring-compliance-under-the-new-labour-codes): Wage structure review and restructuring to align salary components, statutory contributions, and employee benefits with India's new labour code framework.
 
 ### Licensing & Registration

@@ -12,7 +12,7 @@ const DEFAULT_FAQS = [
   {
     id: 1,
     question: "What compliances do you handle?",
-    answer: "We handle a comprehensive range of compliance needs including PF, ESIC, Professional Tax, Labor Welfare Fund, and all major Central and State labor laws across India.",
+    answer: "We handle a comprehensive range of compliance needs including PF, ESIC, Professional Tax, Labour Welfare Fund, and all major Central and State labour laws across India.",
   },
   {
     id: 2,

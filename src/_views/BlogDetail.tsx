@@ -375,7 +375,7 @@ const BlogDetail = ({ id }: { id: string }) => {
                                     Ready to Experience Effortless Compliance?
                                 </h2>
                                 <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-                                    Join hundreds of businesses that trust TrusComp for their labor law compliance and audit needs.
+                                    Join hundreds of businesses that trust TrusComp for their labour law compliance and audit needs.
                                 </p>
                                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                     <Link

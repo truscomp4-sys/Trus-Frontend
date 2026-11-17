@@ -64,7 +64,7 @@ export const complianceUpdates: ComplianceUpdate[] = [
         slug: "digital-inspection-norms",
         icon: Scale,
         title: "Digital Inspection Norms Introduced",
-        summary: "New digital-first inspection norms for labor compliance across all states.",
+        summary: "New digital-first inspection norms for labour compliance across all states.",
         category: "Inspections",
         date: "1 week ago",
         impact: "Tech Shift",
@@ -72,7 +72,7 @@ export const complianceUpdates: ComplianceUpdate[] = [
         content: {
             overview: "In a move towards 'Ease of Doing Business', the Ministry of Labour and Employment is transitioning from physical to digital inspections for several compliance categories.",
             whatChanged: "Inspections will now be triggered by a centralized risk-based system. Most routine audits will be conducted through the 'Shram Suvidha' portal rather than on-site visits.",
-            whoItImpacts: "Factories, commercial establishments, and any business subject to labor law inspections.",
+            whoItImpacts: "Factories, commercial establishments, and any business subject to labour law inspections.",
             whatYouShouldDo: "Ensure all records are digitized and uploaded to the relevant portals. Maintain inspection-ready digital folders for PF, ESIC, and Minimum Wage registers."
         }
     },

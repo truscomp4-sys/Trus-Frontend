@@ -15,7 +15,7 @@ const metrics = [
     value: 7,
     suffix: "+",
     label: "Years of Excellence",
-    tooltip: "Over 7 years of dedicated service in labor law compliance",
+    tooltip: "Over 7 years of dedicated service in labour law compliance",
     gradient: "from-primary to-accent",
   },
   {
@@ -39,7 +39,7 @@ const metrics = [
     value: 15,
     suffix: "+",
     label: "Compliance Domains",
-    tooltip: "Expertise across 15+ major labor law compliance areas",
+    tooltip: "Expertise across 15+ major labour law compliance areas",
     gradient: "from-info to-primary",
   },
 ];
