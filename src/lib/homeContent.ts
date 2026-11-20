@@ -123,7 +123,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
         headline_highlight: "Statutory",
         headline_suffix: "Compliance",
         subheadline:
-            "Reduce compliance risks, automate regulatory returns, and maintain inspection-ready records with India's trusted labour law experts.",
+            "Manage compliance obligations, statutory records and workforce requirements with structured monitoring and expert assistance.",
         cta_label: "Book Free Consultation",
         trust_badges: ["100+ Clients Trust Us", "Pan-India Coverage"],
     },
