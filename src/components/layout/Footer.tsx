@@ -1,13 +1,14 @@
 'use client'
 
 import Link from "next/link";
-import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram, Youtube } from "lucide-react";
 import logo from "@/assets/truscomp-logo.png";
 import { useSettings } from "@/hooks/useSettings";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { data: settings } = useSettings();
+  const youtubeUrl = settings?.social_links?.youtube || "https://www.youtube.com/@TruscompOfficial";
 
   const quickLinks = [
     { name: "Home", path: "/" },
@@ -93,6 +94,15 @@ const Footer = () => {
                   <Instagram className="w-4 h-4" />
                 </a>
               )}
+              <a
+                href={youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-lg bg-background/10 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+                aria-label="YouTube"
+              >
+                <Youtube className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
