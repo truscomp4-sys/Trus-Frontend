@@ -31,7 +31,7 @@ const Header = () => {
   const logoUrl = settings?.website_logo || logo.src;
 
   return (
-    <header className="sticky top-0 z-[100] bg-card backdrop-blur-md border-b border-border">
+    <header className="sticky top-0 z-[100] border-b border-[#393C49]/10 bg-[#FFFFFF]">
       <div className="section-container">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
@@ -47,8 +47,8 @@ const Header = () => {
                 href={link.path}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5
                   ${pathname === link.path
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    ? "bg-[#FE8E01]/10 text-[#393C49]"
+                    : "text-[#393C49] hover:bg-[#FE8E01]/10 hover:text-[#393C49]"
                   }`}
               >
                 {link.icon && <link.icon className="w-4 h-4" />}
@@ -65,8 +65,8 @@ const Header = () => {
                 href={link.path}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5
                   ${pathname === link.path
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    ? "bg-[#FE8E01]/10 text-[#393C49]"
+                    : "text-[#393C49] hover:bg-[#FE8E01]/10 hover:text-[#393C49]"
                   }`}
               >
                 {link.icon && <link.icon className="w-4 h-4" />}
@@ -84,7 +84,7 @@ const Header = () => {
               <ShieldCheck className="w-4 h-4" />
               Admin Login
             </Link> */}
-            <Button asChild className="btn-primary shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all">
+            <Button asChild className="bg-[#FE8E01] text-[#393C49] shadow-none transition-colors hover:bg-[#FE8E01]/90 focus-visible:ring-[#393C49]">
               <Link href="/contact">Book Now</Link>
             </Button>
           </div>
@@ -92,7 +92,7 @@ const Header = () => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
+            className="rounded-lg p-2 text-[#393C49] transition-colors hover:bg-[#FE8E01]/10 lg:hidden"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -110,8 +110,8 @@ const Header = () => {
                   onClick={() => setIsOpen(false)}
                   className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2
                     ${pathname === link.path
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                      ? "bg-[#FE8E01]/10 text-[#393C49]"
+                      : "text-[#393C49] hover:bg-[#FE8E01]/10 hover:text-[#393C49]"
                     }`}
                 >
                   {link.icon && <link.icon className="w-4 h-4" />}
@@ -129,8 +129,8 @@ const Header = () => {
                   onClick={() => setIsOpen(false)}
                   className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2
                     ${pathname === link.path
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                      ? "bg-[#FE8E01]/10 text-[#393C49]"
+                      : "text-[#393C49] hover:bg-[#FE8E01]/10 hover:text-[#393C49]"
                     }`}
                 >
                   {link.icon && <link.icon className="w-4 h-4" />}
@@ -146,7 +146,7 @@ const Header = () => {
                   <ShieldCheck className="w-4 h-4" />
                   Admin Login
                 </Link> */}
-                <Button asChild className="btn-primary w-full shadow-lg shadow-primary/20">
+                <Button asChild className="w-full bg-[#FE8E01] text-[#393C49] shadow-none hover:bg-[#FE8E01]/90 focus-visible:ring-[#393C49]">
                   <Link href="/contact" onClick={() => setIsOpen(false)}>Book Now</Link>
                 </Button>
               </div>

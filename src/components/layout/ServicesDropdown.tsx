@@ -88,8 +88,8 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                     onClick={() => setIsOpen(!isOpen)}
                     className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-between
             ${isServicesActive
-                            ? "text-primary bg-primary/10"
-                            : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                            ? "bg-[#FE8E01]/10 text-[#393C49]"
+                            : "text-[#393C49] hover:bg-[#FE8E01]/10 hover:text-[#393C49]"
                         }`}
                     aria-expanded={isOpen}
                     aria-haspopup="true"
@@ -113,7 +113,7 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                                     <Link
                                         href={`/services/${service.slug}`}
                                         onClick={() => setIsOpen(false)}
-                                        className="block px-4 py-2.5 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200"
+                                        className="block rounded-lg px-4 py-2.5 text-sm text-[#393C49] transition-all duration-200 hover:bg-[#FE8E01]/10 hover:text-[#393C49]"
                                     >
                                         {service.title}
                                     </Link>
@@ -136,7 +136,7 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                                 <Link
                                     href="/services"
                                     onClick={() => setIsOpen(false)}
-                                    className="block px-4 py-2.5 text-sm font-semibold text-primary hover:bg-primary/10 rounded-lg transition-all duration-200 text-center md:text-left"
+                                    className="block rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-[#393C49] transition-all duration-200 hover:bg-[#FE8E01]/10 md:text-left"
                                 >
                                     Explore All Services →
                                 </Link>
@@ -176,8 +176,8 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                 href="/services"
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5 focus:outline-none
           ${isServicesActive
-                        ? "text-primary bg-primary/10"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                        ? "bg-[#FE8E01]/10 text-[#393C49]"
+                        : "text-[#393C49] hover:bg-[#FE8E01]/10 hover:text-[#393C49]"
                     }`}
                 aria-expanded={isOpen}
                 aria-haspopup="true"
@@ -205,7 +205,7 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 15 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full left-[-120px] mt-4 w-[780px] xl:w-[860px] bg-card border border-border rounded-xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] overflow-hidden z-[100] origin-top pointer-events-auto"
+                        className="pointer-events-auto absolute left-[-120px] top-full z-[100] mt-4 w-[780px] origin-top overflow-hidden rounded-xl border border-[#393C49]/10 bg-white shadow-[0_10px_30px_-10px_rgba(57,60,73,0.18)] xl:w-[860px]"
                         role="menu"
                         aria-orientation="vertical"
                     >
@@ -221,11 +221,11 @@ const ServicesDropdown = ({ isMobile = false }: ServicesDropdownProps) => {
                                                 key={item.id}
                                                 href={item.isAction ? '/services' : `/services/${item.slug}`}
                                                 className={`group block py-1.5 text-[14px] leading-[20px] transition-all duration-200 
-                                                    ${item.isAction ? 'font-semibold text-primary' : 'text-muted-foreground'}
+                                                    ${item.isAction ? 'font-semibold text-[#393C49]' : 'text-[#393C49]'}
                                                 `}
                                                 role="menuitem"
                                             >
-                                                <span className="block transition-transform duration-200 ease-in-out group-hover:translate-x-[3px] group-hover:text-[#ff8c00]">
+                                                <span className="block transition-transform duration-200 ease-in-out group-hover:translate-x-[3px] group-hover:text-[#FE8E01]">
                                                     {item.title}
                                                 </span>
                                             </Link>
