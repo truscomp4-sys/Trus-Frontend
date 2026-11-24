@@ -1,10 +1,21 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties, type KeyboardEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import {
+    ArrowLeft,
+    ArrowRight,
+    ArrowUpRight,
+    BadgeCheck,
+    FolderOpen,
+    ReceiptText,
+    Scale,
+    UsersRound,
+    WalletCards,
+    type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DEFAULT_HOME_CONTENT, type HomeServicesContent, type HomeServiceItem } from "@/lib/homeContent";
 
@@ -16,6 +27,7 @@ const SERVICE_PRESENTATION = [
         fallbackDescription: "Expert-led solutions tailored for businesses leveraging automation.",
         href: "/services/end-to-end-labor-law-compliance-management",
         image: "/images/services/labour-law.webp",
+        icon: Scale,
     },
     {
         key: "payroll",
@@ -24,6 +36,7 @@ const SERVICE_PRESENTATION = [
         fallbackDescription: "Advanced automation for error-free payroll processing.",
         href: "/services/payroll-compliance",
         image: "/images/services/payroll.webp",
+        icon: WalletCards,
     },
     {
         key: "records-registers",
@@ -32,6 +45,7 @@ const SERVICE_PRESENTATION = [
         fallbackDescription: "Automated solutions for managing mandatory records.",
         href: "/services/records-registers-compliance-automated-solutions-by-truscomp",
         image: "/images/services/records-registers.webp",
+        icon: FolderOpen,
     },
     {
         key: "licenses-registrations",
@@ -40,6 +54,7 @@ const SERVICE_PRESENTATION = [
         fallbackDescription: "Simplifies licensing, renewals, and amendments seamlessly.",
         href: "/services/licenses-registrations-renewals-amendments",
         image: "/images/services/licenses-registrations.webp",
+        icon: BadgeCheck,
     },
     {
         key: "vendor-compliance",
@@ -48,6 +63,7 @@ const SERVICE_PRESENTATION = [
         fallbackDescription: "Streamlines vendor audits for supply chain visibility.",
         href: "/services/vendor-audit",
         image: "/images/services/vendor-compliance.webp",
+        icon: UsersRound,
     },
     {
         key: "remittances-returns",
@@ -56,12 +72,14 @@ const SERVICE_PRESENTATION = [
         fallbackDescription: "Automated processes for timely remittances and returns.",
         href: "/services/remittances-returns-automated-compliance-by-truscomp",
         image: "/images/services/remittances-returns.webp",
+        icon: ReceiptText,
     },
 ] as const;
 
 type CarouselService = HomeServiceItem & {
     key: string;
     image: string;
+    icon: LucideIcon;
 };
 
 const usePrefersReducedMotion = () => {
@@ -82,75 +100,115 @@ const ServiceCard = ({
     service,
     index,
     total,
-    isActive,
+    position,
+    isHighlighted,
+    onHighlight,
+    onClearHighlight,
 }: {
     service: CarouselService;
     index: number;
     total: number;
-    isActive: boolean;
-}) => (
-    <div
-        className="min-w-0 flex-[0_0_86%] px-2 sm:flex-[0_0_56%] md:flex-[0_0_40%] lg:flex-[0_0_24%] xl:flex-[0_0_20%]"
-        role="group"
-        aria-roledescription="slide"
-        aria-label={`${index + 1} of ${total}: ${service.title}`}
-    >
-        <Link
-            href={service.href}
-            className="group block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] focus-visible:ring-offset-4 focus-visible:ring-offset-[#393C49]"
-            aria-label={`View ${service.title}`}
+    position: number;
+    isHighlighted: boolean;
+    onHighlight: () => void;
+    onClearHighlight: () => void;
+}) => {
+    const ServiceIcon = service.icon;
+    const distance = Math.min(Math.abs(position), 3);
+    const isCentre = position === 0;
+    const angle = position * 2.7;
+    const translateY = distance * 15;
+    const scale = isCentre ? 1.075 : distance === 1 ? 0.98 : 0.93;
+
+    return (
+        <div
+            className="min-w-0 flex-[0_0_86%] px-1.5 sm:flex-[0_0_56%] md:flex-[0_0_40%] lg:flex-[0_0_33.333%]"
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${index + 1} of ${total}: ${service.title}`}
+            style={{ zIndex: 20 - distance }}
         >
-            <article
-                className={cn(
-                    "flex h-[410px] flex-col overflow-hidden rounded-2xl border border-white/20 bg-white transition-[transform,opacity] duration-500 motion-reduce:transition-none sm:h-[430px]",
-                    isActive
-                        ? "-translate-y-2 scale-[1.04] opacity-100"
-                        : "scale-[0.94] opacity-80 group-hover:-translate-y-2 group-hover:scale-[1.04] group-hover:opacity-100 group-focus-visible:-translate-y-2 group-focus-visible:scale-[1.04] group-focus-visible:opacity-100"
-                )}
+            <Link
+                href={service.href}
+                className="group mx-auto block h-full w-full transition-transform duration-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] focus-visible:ring-offset-4 focus-visible:ring-offset-[#393C49] motion-reduce:transition-none lg:w-[76%] lg:translate-x-[var(--fan-x)]"
+                aria-label={`View ${service.title}`}
+                style={{ "--fan-x": `${position * -36}%` } as CSSProperties}
+                onMouseEnter={onHighlight}
+                onMouseLeave={onClearHighlight}
+                onFocus={onHighlight}
+                onBlur={onClearHighlight}
             >
-                <div className="relative h-44 shrink-0 overflow-hidden sm:h-48">
-                    <Image
-                        src={service.image}
-                        alt={`${service.title} compliance service`}
-                        fill
-                        sizes="(max-width: 640px) 86vw, (max-width: 1024px) 40vw, 20vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
-                    />
-                </div>
-
                 <div
-                    className={cn(
-                        "flex flex-1 flex-col p-5 text-[#393C49] transition-colors duration-300 motion-reduce:transition-none sm:p-6",
-                        isActive
-                            ? "bg-[#FE8E01]"
-                            : "bg-white group-hover:bg-[#FE8E01] group-focus-visible:bg-[#FE8E01]"
-                    )}
+                    className="relative h-full origin-bottom transition-[transform,opacity] duration-700 ease-out motion-reduce:transition-none"
+                    style={{
+                        transform: `translateY(${translateY}px) rotate(${angle}deg) scale(${scale})`,
+                        opacity: distance >= 3 ? 0.55 : distance === 2 ? 0.72 : 1,
+                    }}
                 >
-                    <div className="mb-4 flex items-start justify-between gap-4">
-                        <span className="text-xs font-bold uppercase tracking-[0.2em] opacity-70">
-                            Service {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#393C49]/25" aria-hidden="true">
-                            <ArrowUpRight className="h-4 w-4" />
-                        </span>
-                    </div>
+                    <article
+                        className={cn(
+                            "flex h-[430px] flex-col overflow-hidden rounded-[1.6rem] border border-white/35 bg-white shadow-[0_22px_55px_-26px_rgba(0,0,0,0.75)] transition-transform duration-500 group-hover:scale-[1.025] group-focus-visible:scale-[1.025] motion-reduce:transition-none sm:h-[450px]",
+                            isHighlighted && "shadow-[0_30px_65px_-25px_rgba(254,142,1,0.45)]"
+                        )}
+                        style={{ clipPath: "polygon(6% 0, 100% 3%, 94% 100%, 0 97%)" }}
+                    >
+                        <div className="relative h-[47%] shrink-0 overflow-hidden">
+                            <Image
+                                src={service.image}
+                                alt={`${service.title} compliance service`}
+                                fill
+                                sizes="(max-width: 640px) 86vw, (max-width: 1024px) 40vw, 20vw"
+                                className="object-cover transition-transform duration-700 group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
+                            />
+                        </div>
 
-                    <h3 className="text-xl font-extrabold leading-tight sm:text-2xl">
-                        {service.title}
-                    </h3>
-                    <span className="mt-4 h-0.5 w-12 bg-[#393C49]" aria-hidden="true" />
-                    <p className="mt-4 text-sm font-medium leading-6 text-[#393C49]/85">
-                        {service.descriptor}
-                    </p>
+                        <div
+                            className={cn(
+                                "flex flex-1 flex-col px-7 pb-7 pt-5 transition-colors duration-300 motion-reduce:transition-none",
+                                isHighlighted
+                                    ? "bg-[#FE8E01] text-white"
+                                    : "bg-[#FFF9F2] text-[#393C49]"
+                            )}
+                        >
+                            <div className="mb-3 flex items-start justify-between gap-4">
+                                <ServiceIcon
+                                    className={cn(
+                                        "h-9 w-9 transition-colors",
+                                        isHighlighted ? "text-white" : "text-[#FE8E01]"
+                                    )}
+                                    strokeWidth={1.8}
+                                    aria-hidden="true"
+                                />
+                                <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full border", isHighlighted ? "border-white/40 text-white" : "border-[#393C49]/25")} aria-hidden="true">
+                                    <ArrowUpRight className="h-4 w-4" />
+                                </span>
+                            </div>
 
-                    <span className="mt-auto pt-5 text-sm font-bold">
-                        View service <span aria-hidden="true">→</span>
-                    </span>
+                            <h3 className={cn("text-xl leading-tight sm:text-2xl", isHighlighted ? "font-black" : "font-extrabold")}>
+                                {service.title}
+                            </h3>
+                            <span className={cn("mt-3 h-0.5 w-12", isHighlighted ? "bg-white" : "bg-[#393C49]")} aria-hidden="true" />
+                            <p className={cn("mt-3 text-sm leading-5", isHighlighted ? "font-semibold text-white" : "font-medium text-[#393C49]/85")}>
+                                {service.descriptor}
+                            </p>
+
+                            <span className={cn("mt-auto pt-4 text-sm", isHighlighted ? "font-extrabold text-white" : "font-bold")}>
+                                View service <span aria-hidden="true">→</span>
+                            </span>
+                        </div>
+                    </article>
                 </div>
-            </article>
-        </Link>
-    </div>
-);
+            </Link>
+        </div>
+    );
+};
+
+const getRelativePosition = (index: number, selectedIndex: number, total: number) => {
+    let position = index - selectedIndex;
+    if (position > total / 2) position -= total;
+    if (position < -total / 2) position += total;
+    return position;
+};
 
 const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { content?: HomeServicesContent }) => {
     const services = useMemo<CarouselService[]>(
@@ -163,6 +221,7 @@ const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { c
                 href: presentation.href,
                 key: presentation.key,
                 image: presentation.image,
+                icon: presentation.icon,
             };
         }),
         [content.items]
@@ -170,6 +229,7 @@ const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { c
 
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center", skipSnaps: false });
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
     const [isInteractionPaused, setIsInteractionPaused] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const prefersReducedMotion = usePrefersReducedMotion();
@@ -212,8 +272,17 @@ const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { c
     };
 
     return (
-        <section className="overflow-hidden bg-[#393C49] py-20 text-white sm:py-24" aria-labelledby="services-heading">
-            <div className="section-container text-center">
+        <section className="relative overflow-hidden bg-slate-900 py-14 text-white sm:py-16" aria-labelledby="services-heading">
+            <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+                <div className="absolute inset-0 opacity-[0.13] [background-image:linear-gradient(to_right,rgba(255,255,255,0.25)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.25)_1px,transparent_1px)] [background-size:5rem_5rem]" />
+                <div className="absolute -left-48 -top-56 h-[620px] w-[620px] rounded-full bg-[#FE8E01]/16 blur-[110px]" />
+                <div className="absolute -right-52 top-0 h-[700px] w-[700px] rounded-full bg-[#FE8E01]/10 blur-[130px]" />
+                <div className="absolute -bottom-36 left-1/2 h-72 w-[80%] -translate-x-1/2 rounded-[50%] bg-[#FE8E01]/10 blur-3xl" />
+                <div className="absolute bottom-20 left-1/2 h-px w-[88%] -translate-x-1/2 bg-gradient-to-r from-transparent via-[#FE8E01]/65 to-transparent" />
+            </div>
+
+            <div className="section-container relative z-10 text-center">
                 <div className="mb-5 inline-flex items-center gap-3">
                     <span className="h-0.5 w-10 bg-[#FE8E01]" aria-hidden="true" />
                     <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#FE8E01]">Our Services</span>
@@ -223,27 +292,31 @@ const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { c
                 <h2 id="services-heading" className="text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
                     Comprehensive <span className="text-[#FE8E01]">Compliance Solutions</span>
                 </h2>
-                <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/80 sm:text-lg">
+                <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-white/80 sm:text-lg">
                     End-to-end labour law and statutory compliance management with expert support and technology.
                 </p>
             </div>
 
             <div
-                className="relative mx-auto mt-10 max-w-[1600px] sm:mt-14"
+                className="relative z-10 mx-auto mt-6 max-w-[1600px] sm:mt-8"
                 role="region"
                 aria-roledescription="carousel"
                 aria-label="TrusComp compliance services"
                 onMouseEnter={() => setIsInteractionPaused(true)}
-                onMouseLeave={() => setIsInteractionPaused(false)}
+                onMouseLeave={() => {
+                    setHighlightedIndex(null);
+                    setIsInteractionPaused(false);
+                }}
                 onFocusCapture={() => setIsInteractionPaused(true)}
                 onBlurCapture={(event) => {
                     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        setHighlightedIndex(null);
                         setIsInteractionPaused(false);
                     }
                 }}
                 onKeyDown={handleKeyboard}
             >
-                <div ref={emblaRef} className="overflow-hidden px-4 py-10 sm:px-8">
+                <div ref={emblaRef} className="overflow-hidden px-4 py-9 sm:px-8 sm:py-10">
                     <div className="flex touch-pan-y items-stretch">
                         {services.map((service, index) => (
                             <ServiceCard
@@ -251,7 +324,10 @@ const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { c
                                 service={service}
                                 index={index}
                                 total={services.length}
-                                isActive={index === selectedIndex}
+                                position={getRelativePosition(index, selectedIndex, services.length)}
+                                isHighlighted={(highlightedIndex ?? selectedIndex) === index}
+                                onHighlight={() => setHighlightedIndex(index)}
+                                onClearHighlight={() => setHighlightedIndex(null)}
                             />
                         ))}
                     </div>
@@ -261,32 +337,26 @@ const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { c
                     Showing {services[selectedIndex]?.title}
                 </p>
 
-                <div className="section-container mt-2 flex items-center justify-center gap-4">
-                    <button
-                        type="button"
-                        onClick={() => emblaApi?.scrollPrev()}
-                        className="flex h-11 w-11 items-center justify-center rounded-full border border-white/35 text-white transition-colors hover:border-[#FE8E01] hover:bg-[#FE8E01] hover:text-[#393C49] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] motion-reduce:transition-none"
-                        aria-label="Previous service"
-                    >
-                        <ArrowLeft className="h-5 w-5" />
-                    </button>
+                <button
+                    type="button"
+                    onClick={() => emblaApi?.scrollPrev()}
+                    className="absolute left-2 top-[37%] z-40 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-slate-950/70 text-white shadow-lg backdrop-blur-sm transition-colors hover:border-[#FE8E01] hover:bg-[#FE8E01] hover:text-[#393C49] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] motion-reduce:transition-none sm:left-4 sm:top-1/2 sm:h-10 sm:w-10 lg:left-7"
+                    aria-label="Previous service"
+                >
+                    <ArrowLeft className="h-4 w-4" />
+                </button>
 
-                    <span className="min-w-20 text-center text-sm font-bold tracking-[0.15em] text-white/75" aria-hidden="true">
-                        {String(selectedIndex + 1).padStart(2, "0")} / {String(services.length).padStart(2, "0")}
-                    </span>
-
-                    <button
-                        type="button"
-                        onClick={() => emblaApi?.scrollNext()}
-                        className="flex h-11 w-11 items-center justify-center rounded-full border border-white/35 text-white transition-colors hover:border-[#FE8E01] hover:bg-[#FE8E01] hover:text-[#393C49] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] motion-reduce:transition-none"
-                        aria-label="Next service"
-                    >
-                        <ArrowRight className="h-5 w-5" />
-                    </button>
-                </div>
+                <button
+                    type="button"
+                    onClick={() => emblaApi?.scrollNext()}
+                    className="absolute right-2 top-[37%] z-40 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-slate-950/70 text-white shadow-lg backdrop-blur-sm transition-colors hover:border-[#FE8E01] hover:bg-[#FE8E01] hover:text-[#393C49] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] motion-reduce:transition-none sm:right-4 sm:top-1/2 sm:h-10 sm:w-10 lg:right-7"
+                    aria-label="Next service"
+                >
+                    <ArrowRight className="h-4 w-4" />
+                </button>
             </div>
 
-            <div className="section-container mt-10 text-center">
+            <div className="section-container relative z-10 mt-2 text-center sm:mt-3">
                 <Link
                     href="/services"
                     className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#FE8E01] px-8 py-3.5 text-base font-extrabold text-[#393C49] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-[#393C49] motion-reduce:transition-none"
