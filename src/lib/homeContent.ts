@@ -130,7 +130,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
 
     services: {
         eyebrow: "Our Services",
-        heading_prefix: "Our Compliance",
+        heading_prefix: "Comprehensive Compliance",
         heading_highlight: "Solutions",
         cta_label: "Explore All Services",
         items: [
