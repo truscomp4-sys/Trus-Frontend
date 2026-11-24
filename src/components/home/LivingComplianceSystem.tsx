@@ -1,489 +1,298 @@
 'use client'
 
-import { useRef, useEffect, useState } from "react";
-import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import useEmblaCarousel from "embla-carousel-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DEFAULT_HOME_CONTENT, type HomeServicesContent, type HomeServiceItem } from "@/lib/homeContent";
 
-// ----- ORBIT SLOTS -----
-// The layout is a fixed six-point orbit around the core, so where a node sits,
-// which way its hover panel opens and which icon it gets are positional facts
-// that stay in code. Only the copy comes from the admin panel, and only the
-// first SLOTS.length services are rendered.
-const SLOTS = [
+const SERVICE_PRESENTATION = [
     {
-        desktop: { top: "10%", left: "50%", transform: "translateX(-50%)" },
-        angle: 270,
-        panelAbove: false,
-        iconPath: "M9 12l2 2 4-4 M12 3v1m6.364 1.636l-.707.707M21 12h-1M18.364 18.364l-.707-.707M12 21v-1M4.636 18.364l.707-.707M3 12h1M5.636 4.636l.707.707"
+        key: "labour-law",
+        match: /labour law/i,
+        fallbackTitle: "Labour Law Compliance",
+        fallbackDescription: "Expert-led solutions tailored for businesses leveraging automation.",
+        href: "/services/end-to-end-labor-law-compliance-management",
+        image: "/images/services/labour-law.webp",
     },
     {
-        desktop: { top: "25%", right: "8%" },
-        angle: 330,
-        panelAbove: false,
-        iconPath: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+        key: "payroll",
+        match: /payroll/i,
+        fallbackTitle: "Payroll Compliance",
+        fallbackDescription: "Advanced automation for error-free payroll processing.",
+        href: "/services/payroll-compliance",
+        image: "/images/services/payroll.webp",
     },
     {
-        desktop: { bottom: "25%", right: "8%" },
-        angle: 30,
-        panelAbove: true,
-        iconPath: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        key: "records-registers",
+        match: /records|registers/i,
+        fallbackTitle: "Records & Registers",
+        fallbackDescription: "Automated solutions for managing mandatory records.",
+        href: "/services/records-registers-compliance-automated-solutions-by-truscomp",
+        image: "/images/services/records-registers.webp",
     },
     {
-        desktop: { bottom: "10%", left: "50%", transform: "translateX(-50%)" },
-        angle: 90,
-        panelAbove: true,
-        iconPath: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        key: "licenses-registrations",
+        match: /licenses|registrations/i,
+        fallbackTitle: "Licenses & Registrations",
+        fallbackDescription: "Simplifies licensing, renewals, and amendments seamlessly.",
+        href: "/services/licenses-registrations-renewals-amendments",
+        image: "/images/services/licenses-registrations.webp",
     },
     {
-        desktop: { bottom: "25%", left: "8%" },
-        angle: 150,
-        panelAbove: true,
-        iconPath: "M9 7h6m-6 4h6m-6 4h4m-7 4h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+        key: "vendor-compliance",
+        match: /vendor/i,
+        fallbackTitle: "Vendor Audit",
+        fallbackDescription: "Streamlines vendor audits for supply chain visibility.",
+        href: "/services/vendor-audit",
+        image: "/images/services/vendor-compliance.webp",
     },
     {
-        desktop: { top: "25%", left: "8%" },
-        angle: 210,
-        panelAbove: false,
-        iconPath: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-    }
-];
+        key: "remittances-returns",
+        match: /remittances|returns/i,
+        fallbackTitle: "Remittances & Returns",
+        fallbackDescription: "Automated processes for timely remittances and returns.",
+        href: "/services/remittances-returns-automated-compliance-by-truscomp",
+        image: "/images/services/remittances-returns.webp",
+    },
+] as const;
 
-// ----- ANIMATED BACKGROUND -----
-const AnimatedBackground = () => (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-        {/* 1. Dark Base tone: dark bluish-grey / charcoal */}
-        <div className="absolute inset-0 bg-[#0F172A]" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#0F172A]" />
-
-        {/* 2. Grid Pattern Overlay (Refined and premium) */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-
-        {/* 3. Central Radial Glow (Warm orange brand accent) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-
-        {/* 4. Ambient Drifting Orbs (Subtle depth) */}
-        <div className="absolute top-[10%] left-[15%] w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float-organic" />
-        <div className="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] bg-slate-400/5 rounded-full blur-3xl animate-float-organic" style={{ animationDelay: '-4s' }} />
-
-        {/* 5. Cinematic Grain Texture */}
-        <div
-            className="absolute inset-0 opacity-[0.2] mix-blend-overlay pointer-events-none"
-            style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-            }}
-        />
-    </div>
-);
-
-// ----- CENTRAL COMPLIANCE CORE -----
-const ComplianceCore = ({ isVisible }: { isVisible: boolean }) => (
-    <div
-        className={cn(
-            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-1000",
-            isVisible ? "opacity-100 scale-100" : "opacity-0 scale-75"
-        )}
-    >
-        {/* Outer Orbit Ring */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
-            <svg viewBox="0 0 100 100" className="w-full h-full animate-spin-slow" style={{ animationDuration: '60s' }}>
-                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="0.3" strokeDasharray="4 6" className="text-slate-300" />
-            </svg>
-        </div>
-
-        {/* Middle Ring */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64">
-            <svg viewBox="0 0 100 100" className="w-full h-full animate-spin-slow" style={{ animationDuration: '45s', animationDirection: 'reverse' }}>
-                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 8" className="text-orange-300/50" />
-            </svg>
-        </div>
-
-        {/* Inner Core */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28">
-            {/* Breathing Glow */}
-            <div className="absolute inset-0 rounded-full bg-orange-400/20 animate-pulse blur-xl" style={{ animationDuration: '3s' }} />
-
-            {/* Core Circle */}
-            <div className="absolute inset-2 rounded-full border-2 border-orange-400/40 bg-gradient-to-br from-white via-orange-50 to-white shadow-lg">
-                {/* Node Cluster */}
-                <svg viewBox="0 0 40 40" className="w-full h-full p-2">
-                    <circle cx="20" cy="12" r="2" className="fill-orange-400" />
-                    <circle cx="12" cy="24" r="2" className="fill-orange-400" />
-                    <circle cx="28" cy="24" r="2" className="fill-orange-400" />
-                    <line x1="20" y1="12" x2="12" y2="24" stroke="currentColor" strokeWidth="1" className="text-orange-300" />
-                    <line x1="20" y1="12" x2="28" y2="24" stroke="currentColor" strokeWidth="1" className="text-orange-300" />
-                    <line x1="12" y1="24" x2="28" y2="24" stroke="currentColor" strokeWidth="1" className="text-orange-300" />
-                </svg>
-            </div>
-        </div>
-
-        {/* Orbiting Micro Elements */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 md:w-80 md:h-80 lg:w-[22rem] lg:h-[22rem] animate-spin-slow" style={{ animationDuration: '30s' }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-orange-400/60" />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-slate-400/60" />
-        </div>
-    </div>
-);
-
-// ----- CONNECTOR LINE -----
-const ConnectorLine = ({ angle, isVisible, isActive }: { angle: number, isVisible: boolean, isActive: boolean }) => {
-    // Calculate line position based on angle
-    const length = 120; // Length from center
-    const startOffset = 60; // Start distance from center
-
-    return (
-        <div
-            className="absolute top-1/2 left-1/2 hidden lg:block"
-            style={{
-                transform: `rotate(${angle}deg)`,
-                transformOrigin: '0 0'
-            }}
-        >
-            <div
-                className={cn(
-                    "h-[1px] transition-all duration-700",
-                    isVisible ? "opacity-100" : "opacity-0"
-                )}
-                style={{
-                    width: `${length}px`,
-                    marginLeft: `${startOffset}px`,
-                    background: isActive
-                        ? 'linear-gradient(90deg, transparent, hsl(24, 80%, 60%), transparent)'
-                        : 'linear-gradient(90deg, transparent, hsl(220, 20%, 80%), transparent)'
-                }}
-            >
-                {/* Pulse Animation */}
-                <div
-                    className={cn(
-                        "absolute inset-0 animate-pulse",
-                        isActive ? "bg-orange-400/30" : "bg-slate-400/20"
-                    )}
-                    style={{ animationDuration: '2s' }}
-                />
-            </div>
-            {/* Dot at end */}
-            <div
-                className={cn(
-                    "absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full transition-all duration-500",
-                    isActive ? "bg-orange-400" : "bg-slate-300"
-                )}
-                style={{ left: `${startOffset + length - 2}px` }}
-            />
-        </div>
-    );
+type CarouselService = HomeServiceItem & {
+    key: string;
+    image: string;
 };
 
-// ----- SERVICE LABEL (FLOATING) -----
-const ServiceLabel = ({
-    service,
-    slot,
-    index,
-    isVisible,
-    isActive,
-    onHover,
-    onLeave
-}: {
-    service: HomeServiceItem,
-    slot: typeof SLOTS[number],
-    index: number,
-    isVisible: boolean,
-    isActive: boolean,
-    onHover: () => void,
-    onLeave: () => void
-}) => {
-    const [showOutcomes, setShowOutcomes] = useState(false);
+const usePrefersReducedMotion = () => {
+    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-    return (
+    useEffect(() => {
+        const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const update = () => setPrefersReducedMotion(query.matches);
+        update();
+        query.addEventListener("change", update);
+        return () => query.removeEventListener("change", update);
+    }, []);
+
+    return prefersReducedMotion;
+};
+
+const ServiceCard = ({
+    service,
+    index,
+    total,
+    isActive,
+}: {
+    service: CarouselService;
+    index: number;
+    total: number;
+    isActive: boolean;
+}) => (
+    <div
+        className="min-w-0 flex-[0_0_86%] px-2 sm:flex-[0_0_56%] md:flex-[0_0_40%] lg:flex-[0_0_24%] xl:flex-[0_0_20%]"
+        role="group"
+        aria-roledescription="slide"
+        aria-label={`${index + 1} of ${total}: ${service.title}`}
+    >
         <Link
             href={service.href}
-            className={cn(
-                "absolute hidden lg:block transition-all duration-700 cursor-pointer",
-                isVisible ? "opacity-100" : "opacity-0 translate-y-4",
-                // Z-Index Handling: Ensure active/hovered item renders above everything else (including CTA)
-                isActive || showOutcomes ? "z-50" : "z-10"
-            )}
-            style={{
-                ...slot.desktop,
-                transitionDelay: isVisible ? `${index * 150}ms` : '0ms'
-            }}
-            onMouseEnter={() => { onHover(); setShowOutcomes(true); }}
-            onMouseLeave={() => { onLeave(); setShowOutcomes(false); }}
+            className="group block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] focus-visible:ring-offset-4 focus-visible:ring-offset-[#393C49]"
+            aria-label={`View ${service.title}`}
         >
-            <div className={cn(
-                "transition-all duration-300",
-                isActive ? "scale-[1.03]" : "scale-100",
-                !isActive && "opacity-70"
-            )}>
-                {/* Service Title */}
-                <h3 className={cn(
-                    "text-lg md:text-xl font-display font-semibold transition-colors duration-300",
-                    isActive ? "text-primary" : "text-slate-100"
-                )}>
-                    {service.title}
-                </h3>
+            <article
+                className={cn(
+                    "flex h-[410px] flex-col overflow-hidden rounded-2xl border border-white/20 bg-white transition-[transform,opacity] duration-500 motion-reduce:transition-none sm:h-[430px]",
+                    isActive
+                        ? "-translate-y-2 scale-[1.04] opacity-100"
+                        : "scale-[0.94] opacity-80 group-hover:-translate-y-2 group-hover:scale-[1.04] group-hover:opacity-100 group-focus-visible:-translate-y-2 group-focus-visible:scale-[1.04] group-focus-visible:opacity-100"
+                )}
+            >
+                <div className="relative h-44 shrink-0 overflow-hidden sm:h-48">
+                    <Image
+                        src={service.image}
+                        alt={`${service.title} compliance service`}
+                        fill
+                        sizes="(max-width: 640px) 86vw, (max-width: 1024px) 40vw, 20vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
+                    />
+                </div>
 
-                {/* Animated Underline */}
-                <div className={cn(
-                    "h-[2px] bg-primary mt-1 transition-all duration-300 origin-left",
-                    isActive ? "w-full" : "w-0"
-                )} />
+                <div
+                    className={cn(
+                        "flex flex-1 flex-col p-5 text-[#393C49] transition-colors duration-300 motion-reduce:transition-none sm:p-6",
+                        isActive
+                            ? "bg-[#FE8E01]"
+                            : "bg-white group-hover:bg-[#FE8E01] group-focus-visible:bg-[#FE8E01]"
+                    )}
+                >
+                    <div className="mb-4 flex items-start justify-between gap-4">
+                        <span className="text-xs font-bold uppercase tracking-[0.2em] opacity-70">
+                            Service {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#393C49]/25" aria-hidden="true">
+                            <ArrowUpRight className="h-4 w-4" />
+                        </span>
+                    </div>
 
-                {/* Descriptor */}
-                <p className={cn(
-                    "text-sm mt-2 max-w-[200px] transition-all duration-300",
-                    isActive ? "opacity-100 translate-y-0 text-slate-300" : "opacity-0 -translate-y-2"
-                )}>
-                    {service.descriptor}
+                    <h3 className="text-xl font-extrabold leading-tight sm:text-2xl">
+                        {service.title}
+                    </h3>
+                    <span className="mt-4 h-0.5 w-12 bg-[#393C49]" aria-hidden="true" />
+                    <p className="mt-4 text-sm font-medium leading-6 text-[#393C49]/85">
+                        {service.descriptor}
+                    </p>
+
+                    <span className="mt-auto pt-5 text-sm font-bold">
+                        View service <span aria-hidden="true">→</span>
+                    </span>
+                </div>
+            </article>
+        </Link>
+    </div>
+);
+
+const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { content?: HomeServicesContent }) => {
+    const services = useMemo<CarouselService[]>(
+        () => SERVICE_PRESENTATION.map((presentation) => {
+            const source = content.items.find((item) => presentation.match.test(item.title));
+            return {
+                title: source?.title || presentation.fallbackTitle,
+                descriptor: source?.descriptor || presentation.fallbackDescription,
+                outcomes: source?.outcomes || [],
+                href: presentation.href,
+                key: presentation.key,
+                image: presentation.image,
+            };
+        }),
+        [content.items]
+    );
+
+    const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center", skipSnaps: false });
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [isInteractionPaused, setIsInteractionPaused] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const prefersReducedMotion = usePrefersReducedMotion();
+
+    const updateSelected = useCallback(() => {
+        if (emblaApi) setSelectedIndex(emblaApi.selectedScrollSnap());
+    }, [emblaApi]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+
+        updateSelected();
+        emblaApi.on("select", updateSelected);
+        emblaApi.on("reInit", updateSelected);
+        emblaApi.on("pointerDown", () => setIsDragging(true));
+        emblaApi.on("settle", () => setIsDragging(false));
+
+        return () => {
+            emblaApi.off("select", updateSelected);
+            emblaApi.off("reInit", updateSelected);
+        };
+    }, [emblaApi, updateSelected]);
+
+    useEffect(() => {
+        if (!emblaApi || prefersReducedMotion || isInteractionPaused || isDragging) return;
+        const interval = window.setInterval(() => emblaApi.scrollNext(), 4000);
+        return () => window.clearInterval(interval);
+    }, [emblaApi, isDragging, isInteractionPaused, prefersReducedMotion]);
+
+    const handleKeyboard = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (!emblaApi) return;
+        if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            emblaApi.scrollPrev();
+        }
+        if (event.key === "ArrowRight") {
+            event.preventDefault();
+            emblaApi.scrollNext();
+        }
+    };
+
+    return (
+        <section className="overflow-hidden bg-[#393C49] py-20 text-white sm:py-24" aria-labelledby="services-heading">
+            <div className="section-container text-center">
+                <div className="mb-5 inline-flex items-center gap-3">
+                    <span className="h-0.5 w-10 bg-[#FE8E01]" aria-hidden="true" />
+                    <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#FE8E01]">Our Services</span>
+                    <span className="h-0.5 w-10 bg-[#FE8E01]" aria-hidden="true" />
+                </div>
+
+                <h2 id="services-heading" className="text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
+                    Comprehensive <span className="text-[#FE8E01]">Compliance Solutions</span>
+                </h2>
+                <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/80 sm:text-lg">
+                    End-to-end labour law and statutory compliance management with expert support and technology.
                 </p>
             </div>
 
-            {/* Floating Outcome Panel - Position based on service location */}
-            <div className={cn(
-                "absolute p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-border/50 transition-all duration-300 min-w-[180px] z-20",
-                // Position panel to avoid overlap with CTA: nodes sitting on the
-                // lower half of the orbit open their panel upwards.
-                slot.panelAbove ? 'bottom-full mb-2' : 'mt-3',
-                showOutcomes && isActive ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-            )}>
-                {service.outcomes.map((outcome, i) => (
-                    <div
-                        key={outcome}
-                        className="flex items-center gap-2 text-xs text-foreground/80 py-1"
-                        style={{ transitionDelay: `${i * 50}ms` }}
-                    >
-                        <div className="w-1 h-1 rounded-full bg-primary" />
-                        {outcome}
-                    </div>
-                ))}
-            </div>
-        </Link>
-    );
-};
-
-// ----- MOBILE/TABLET SERVICE ITEM -----
-const MobileServiceItem = ({
-    service,
-    slot,
-    index,
-    isVisible
-}: {
-    service: HomeServiceItem,
-    slot: typeof SLOTS[number],
-    index: number,
-    isVisible: boolean
-}) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    // Premium mobile palette
-    const bgColors = ["bg-[#FFFFFF]", "bg-[#FFF6EC]", "bg-[#FAF3E8]"];
-    const bgColor = bgColors[index % bgColors.length];
-
-    return (
-        <div
-            className={cn(
-                "relative overflow-hidden rounded-2xl border border-border/40 transition-all duration-500 cursor-pointer shadow-sm",
-                bgColor,
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
-                isExpanded ? "shadow-xl scale-[1.02] ring-1 ring-primary/10" : "hover:shadow-md"
-            )}
-            style={{ transitionDelay: `${index * 100}ms` }}
-            onClick={() => setIsExpanded(!isExpanded)}
-        >
-            {/* Accent Line */}
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary/60 to-transparent" />
-
-            <div className="p-5 pl-6">
-                <div className="flex items-center gap-4">
-                    {/* Service Icon */}
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" className="w-6 h-6 text-primary">
-                            <path
-                                d={slot.iconPath}
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
-                    </div>
-
-                    <div className="flex-1">
-                        <h3 className="text-sm md:text-base font-display font-bold text-slate-900">
-                            {service.title}
-                        </h3>
-                        <p className="text-[11px] font-medium text-slate-500 mt-0.5">
-                            {service.descriptor.slice(0, 45)}{service.descriptor.length > 45 ? "..." : ""}
-                        </p>
-                    </div>
-
-                    {/* Expand Indicator */}
-                    <div className={cn(
-                        "w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center transition-all duration-300",
-                        isExpanded && "rotate-180 bg-primary/10"
-                    )}>
-                        <svg viewBox="0 0 24 24" className="w-4 h-4 text-muted-foreground">
-                            <path d="M6 9 L12 15 L18 9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
-                    </div>
-                </div>
-
-                {/* Expandable Content */}
-                <div className={cn(
-                    "overflow-hidden transition-all duration-400 ease-out",
-                    isExpanded ? "max-h-60 opacity-100 mt-4" : "max-h-0 opacity-0"
-                )}>
-                    <div className="pt-4 border-t border-border/30">
-                        <p className="text-xs md:text-sm font-medium text-slate-600 leading-relaxed mb-4">
-                            {service.descriptor}
-                        </p>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {service.outcomes.map((outcome) => (
-                                <span
-                                    key={outcome}
-                                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary font-medium"
-                                >
-                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M5 12l5 5L20 7" />
-                                    </svg>
-                                    {outcome}
-                                </span>
-                            ))}
-                        </div>
-                        <Link
-                            href={service.href}
-                            className="inline-flex items-center text-xs font-bold text-primary hover:underline"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            Learn more <svg className="w-3 h-3 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" /></svg>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// ----- MAIN COMPONENT -----
-const LivingComplianceSystem = ({ content = DEFAULT_HOME_CONTENT.services }: { content?: HomeServicesContent }) => {
-    const sectionRef = useRef<HTMLDivElement>(null);
-    const [isInView, setIsInView] = useState(false);
-    const [activeService, setActiveService] = useState<string | null>(null);
-
-    // The orbit has a fixed number of positions; anything beyond them is dropped.
-    const services = content.items.slice(0, SLOTS.length);
-
-    // Intersection Observer for scroll-triggered animations
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsInView(true);
-                }
-            },
-            { threshold: 0.2 }
-        );
-
-        if (sectionRef.current) {
-            observer.observe(sectionRef.current);
-        }
-
-        return () => observer.disconnect();
-    }, []);
-
-    return (
-        <section
-            ref={sectionRef}
-            className="relative w-full min-h-screen py-20 lg:py-0 lg:h-screen bg-[#0F172A] overflow-hidden"
-        >
-            {/* Animated Background */}
-            <AnimatedBackground />
-
-            {/* Section Header */}
-            <div className={cn(
-                "relative z-10 text-center pt-12 lg:pt-20 px-6 transition-all duration-700",
-                isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            )}>
-                <div className="inline-flex items-center gap-2 mb-4">
-                    <span className="h-[2px] w-8 bg-primary rounded-full" />
-                    <span className="text-sm font-semibold uppercase tracking-widest text-primary">{content.eyebrow}</span>
-                    <span className="h-[2px] w-8 bg-primary rounded-full" />
-                </div>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white">
-                    {content.heading_prefix} <span className="text-primary"> {content.heading_highlight} </span>
-                </h2>
-            </div>
-
-            {/* Desktop Layout - System View */}
-            <div className="hidden lg:block relative w-full max-w-[1400px] mx-auto h-[calc(100vh-200px)] px-12">
-                {/* Central Core */}
-                <ComplianceCore isVisible={isInView} />
-
-                {/* Connector Lines */}
-                {services.map((service, index) => (
-                    <ConnectorLine
-                        key={`line-${service.title}-${index}`}
-                        angle={SLOTS[index].angle}
-                        isVisible={isInView}
-                        isActive={activeService === service.title}
-                    />
-                ))}
-
-                {/* Service Labels */}
-                {services.map((service, index) => (
-                    <ServiceLabel
-                        key={`${service.title}-${index}`}
-                        service={service}
-                        slot={SLOTS[index]}
-                        index={index}
-                        isVisible={isInView}
-                        isActive={activeService === service.title || activeService === null}
-                        onHover={() => setActiveService(service.title)}
-                        onLeave={() => setActiveService(null)}
-                    />
-                ))}
-            </div>
-
-            {/* Mobile/Tablet Layout - Vertical Flow */}
-            <div className="lg:hidden relative z-10 px-4 sm:px-6 mt-8">
-                {/* Subtle Core Background for Mobile */}
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-64 h-64 opacity-10 pointer-events-none">
-                    <div className="w-full h-full rounded-full border-2 border-dashed border-primary/30 animate-spin-slow" style={{ animationDuration: '30s' }} />
-                    <div className="absolute inset-8 rounded-full border border-dashed border-primary/20 animate-spin-slow" style={{ animationDuration: '20s', animationDirection: 'reverse' }} />
-                </div>
-
-                {/* Mobile Service List */}
-                <div className="relative space-y-4">
-                    {services.map((service, index) => (
-                        <MobileServiceItem
-                            key={`${service.title}-${index}`}
-                            service={service}
-                            slot={SLOTS[index]}
-                            index={index}
-                            isVisible={isInView}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            {/* CTA Button */}
-            <div className={cn(
-                "relative z-20 text-center mt-12 mb-8 lg:mb-0 lg:absolute lg:bottom-6 lg:left-1/2 lg:-translate-x-1/2 transition-all duration-700",
-                isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            )}
-                style={{ transitionDelay: '600ms' }}
+            <div
+                className="relative mx-auto mt-10 max-w-[1600px] sm:mt-14"
+                role="region"
+                aria-roledescription="carousel"
+                aria-label="TrusComp compliance services"
+                onMouseEnter={() => setIsInteractionPaused(true)}
+                onMouseLeave={() => setIsInteractionPaused(false)}
+                onFocusCapture={() => setIsInteractionPaused(true)}
+                onBlurCapture={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        setIsInteractionPaused(false);
+                    }
+                }}
+                onKeyDown={handleKeyboard}
             >
+                <div ref={emblaRef} className="overflow-hidden px-4 py-10 sm:px-8">
+                    <div className="flex touch-pan-y items-stretch">
+                        {services.map((service, index) => (
+                            <ServiceCard
+                                key={service.key}
+                                service={service}
+                                index={index}
+                                total={services.length}
+                                isActive={index === selectedIndex}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                <p className="sr-only" aria-live="polite">
+                    Showing {services[selectedIndex]?.title}
+                </p>
+
+                <div className="section-container mt-2 flex items-center justify-center gap-4">
+                    <button
+                        type="button"
+                        onClick={() => emblaApi?.scrollPrev()}
+                        className="flex h-11 w-11 items-center justify-center rounded-full border border-white/35 text-white transition-colors hover:border-[#FE8E01] hover:bg-[#FE8E01] hover:text-[#393C49] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] motion-reduce:transition-none"
+                        aria-label="Previous service"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
+                    </button>
+
+                    <span className="min-w-20 text-center text-sm font-bold tracking-[0.15em] text-white/75" aria-hidden="true">
+                        {String(selectedIndex + 1).padStart(2, "0")} / {String(services.length).padStart(2, "0")}
+                    </span>
+
+                    <button
+                        type="button"
+                        onClick={() => emblaApi?.scrollNext()}
+                        className="flex h-11 w-11 items-center justify-center rounded-full border border-white/35 text-white transition-colors hover:border-[#FE8E01] hover:bg-[#FE8E01] hover:text-[#393C49] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FE8E01] motion-reduce:transition-none"
+                        aria-label="Next service"
+                    >
+                        <ArrowRight className="h-5 w-5" />
+                    </button>
+                </div>
+            </div>
+
+            <div className="section-container mt-10 text-center">
                 <Link
                     href="/services"
-                    className="group relative inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#FE8E01] px-8 py-3.5 text-base font-extrabold text-[#393C49] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-[#393C49] motion-reduce:transition-none"
                 >
-                    {/* Glow */}
-                    <span className="absolute inset-0 rounded-full bg-primary/20 blur-xl group-hover:blur-2xl transition-all duration-500 -z-10" />
-
-                    <span className="relative">{content.cta_label}</span>
-                    <svg className="relative w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
+                    Explore All Services
+                    <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Link>
             </div>
         </section>
