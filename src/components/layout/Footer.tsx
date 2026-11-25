@@ -164,17 +164,7 @@ const Footer = () => {
               <li className="flex items-start gap-3 text-sm text-background/70">
                 <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                 <span>
-                  {settings?.office_address ? (
-                    [
-                      settings.office_address.line1,
-                      settings.office_address.street,
-                      settings.office_address.district,
-                      settings.office_address.state,
-                      settings.office_address.country
-                    ].filter(Boolean).join(', ') + (settings.office_address.pincode ? ` - ${settings.office_address.pincode}` : '')
-                  ) : (
-                    "TrusComp Private Limited, No.9, 3rd Floor, Pe Ve plaza, Lakshmi Nagar, Tamil Nadu, India - 600116"
-                  )}
+                  2nd Floor, Pe Ve plaza, 9, Arcot Rd, Sai Nagar, Lakshmi Nagar, Porur, Chennai, Tamil Nadu 600116
                 </span>
               </li>
               <li className="flex items-center gap-3 text-sm text-background/70">
