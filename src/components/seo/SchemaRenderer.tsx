@@ -3,20 +3,32 @@
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+type SchemaState = {
+  pathname: string
+  data: unknown
+}
+
 export default function SchemaRenderer() {
   const pathname = usePathname()
-  const [schemaJson, setSchemaJson] = useState<any>(null)
+  const [schemaState, setSchemaState] = useState<SchemaState | null>(null)
 
   useEffect(() => {
+    const controller = new AbortController()
+    let cancelled = false
+
+    // Clear the previous route's schema immediately and keep homepage schema server-rendered.
+    setSchemaState(null)
+    if (pathname === '/') {
+      return () => controller.abort()
+    }
+
     const fetchSchema = async () => {
       try {
-        let pageType = 'home'
+        let pageType = ''
         let referenceId: string | null = null
 
         // Map pathname to matching pageType and referenceId in line with fetchSEOMeta calls
-        if (pathname === '/') {
-          pageType = 'home'
-        } else if (pathname === '/about') {
+        if (pathname === '/about') {
           pageType = 'about'
         } else if (pathname === '/services') {
           pageType = 'services_main'
@@ -45,7 +57,6 @@ export default function SchemaRenderer() {
           referenceId = pathname.replace('/updates/', '')
         } else {
           // Avoid making API calls for routes that are not tracked (e.g. admin routes)
-          setSchemaJson(null)
           return
         }
 
@@ -56,27 +67,33 @@ export default function SchemaRenderer() {
         url.searchParams.set('page_type', pageType)
         if (referenceId) url.searchParams.set('page_reference_id', referenceId)
 
-        const res = await fetch(url.toString())
+        const res = await fetch(url.toString(), { signal: controller.signal })
+        if (cancelled) return
+
         if (res.ok) {
           const data = await res.json()
-          if (data && data.schema_json) {
-            setSchemaJson(data.schema_json)
-          } else {
-            setSchemaJson(null)
+          if (!cancelled && data && data.schema_json) {
+            setSchemaState({ pathname, data: data.schema_json })
           }
-        } else {
-          setSchemaJson(null)
         }
       } catch (err) {
-        console.error('Error fetching dynamic schema JSON-LD:', err)
-        setSchemaJson(null)
+        if (!cancelled && !(err instanceof DOMException && err.name === 'AbortError')) {
+          console.error('Error fetching dynamic schema JSON-LD:', err)
+        }
       }
     }
 
     fetchSchema()
+
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
   }, [pathname])
 
-  if (!schemaJson) return null
+  if (!schemaState || schemaState.pathname !== pathname) return null
+
+  const schemaJson = schemaState.data
 
   // Ensure that no malicious nested closing script tag breaks the DOM injection
   const safeSchemaString = typeof schemaJson === 'object'
